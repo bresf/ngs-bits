@@ -67,6 +67,7 @@ SOURCES += BedFile.cpp \
     VariantScores.cpp
     FileLocationProvider.cpp \
     FileLocationProviderFileSystem.cpp \
+    FileLocationHelper.cpp \
     PhenotypeList.cpp
 
 HEADERS += BedFile.h \
@@ -103,6 +104,7 @@ HEADERS += BedFile.h \
     VariantScores.h
     FileLocationProvider.h \
     FileLocationProviderFileSystem.h \
+    FileLocationHelper.h \
     PhenotypeList.h
 
 RESOURCES += \
