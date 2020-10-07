@@ -412,6 +412,7 @@ private:
 	VariantList somatic_control_tissue_variants_;
 	bool cf_dna_available;
 	QToolButton* cfdna_menu_btn_;
+	QSharedPointer<FileLocationProvider> commonFileLocationProvider_;
 
 	//SPECIAL
 	DelayedInitializationTimer init_timer_;
