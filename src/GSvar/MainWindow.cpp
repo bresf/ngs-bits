@@ -1192,7 +1192,7 @@ void MainWindow::openInIGV(QString region)
 		}
 
 		//sample BAM file(s)
-		QList<FileLocation> bams = getBamFiles();
+		QList<FileLocation> bams = commonFileLocationProvider_->getBamFiles();
 		if (bams.empty()) return;
 		foreach(const FileLocation& file, bams)
 		{
@@ -3553,7 +3553,7 @@ void MainWindow::generateReportGermline()
 
 	//get BAM file name if necessary
 	QString bam_file = "";
-	QList<FileLocation> bams = getBamFiles();
+	QList<FileLocation> bams = commonFileLocationProvider_->getBamFiles();
 	if (bams.empty()) return;
 	bam_file = bams.first().filename;
 
@@ -4356,7 +4356,7 @@ void MainWindow::on_actionGapsRecalculate_triggered()
 	if (filename_=="") return;
 
 	//check for BAM file
-	QList<FileLocation> bams = getBamFiles();
+	QList<FileLocation> bams = commonFileLocationProvider_->getBamFiles();
 	if (bams.empty()) return;
 	QString bam_file = bams.first().filename;
 
@@ -5115,7 +5115,7 @@ void MainWindow::contextMenuSingleVariant(QPoint pos, int index)
 			QString value = parts[0];
 			if (value=="BAM")
 			{
-				QList<FileLocation> bams = getBamFiles();
+				QList<FileLocation> bams = commonFileLocationProvider_->getBamFiles();
 				if (bams.empty()) return;
 				value = "BAM<" + bams.first().filename;
 			}
@@ -5664,11 +5664,6 @@ QStringList MainWindow::getLogFiles()
 	QString path = QFileInfo(filename_).absolutePath();
 
 	return Helper::findFiles(path, "*_log?_*.log", false);
-}
-
-QList<FileLocation> MainWindow::getBamFiles()
-{
-	return commonFileLocationProvider_->getBamFiles();
 }
 
 QList<FileLocation> MainWindow::getSegFilesCnv()
