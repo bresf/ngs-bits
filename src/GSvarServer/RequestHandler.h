@@ -5,7 +5,6 @@
 #include <QTcpSocket>
 
 #include <QList>
-#include <QUuid>
 #include "WebEntity.h"
 #include "Api.h"
 #include "Exceptions.h"
@@ -34,6 +33,7 @@ private:
 	Api *api;
 	Request::MethodType inferRequestMethod(QByteArray in);
 	void writeResponse(Response response);
+	bool hasEndOfLineCharsOnly(QByteArray line);
 
 };
 

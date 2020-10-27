@@ -36,8 +36,7 @@ Request::MethodType RequestHandler::inferRequestMethod(QByteArray in)
 		return Request::MethodType::PATCH;
 	}
 
-	// should be an exception
-	return Request::MethodType::GET;
+	THROW(ArgumentException, "Incorrect request method");
 }
 
 void RequestHandler::dataReceived()
@@ -60,12 +59,21 @@ void RequestHandler::dataReceived()
 					return;
 				}
 
-				request.method = inferRequestMethod(sent_data_items[0].toUpper());
+				try
+				{
+					request.method = inferRequestMethod(sent_data_items[0].toUpper());
+				}
+				catch (ArgumentException& e)
+				{
+					writeResponse(api->showError(WebEntity::BAD_REQUEST, e.message()));
+					return;
+				}
 				request.path = sent_data_items[1];
 
 				state = State::PROCESSING_HEADERS;
 			}
-			else if (socket->bytesAvailable() > MAX_REQUEST_LENGTH) {
+			else if (socket->bytesAvailable() > MAX_REQUEST_LENGTH)
+			{
 				writeResponse(api->showError(WebEntity::BAD_REQUEST, "Maximum request lenght has been exceeded"));
 				return;
 			}
@@ -77,27 +85,28 @@ void RequestHandler::dataReceived()
 			while (socket->canReadLine()) {
 				QByteArray sent_data = socket->readLine();
 
-
-				if (sent_data == QByteArrayLiteral("\r\n") || sent_data == QByteArrayLiteral("\n")) {
-					result = api->processRequest(request);
+				if (hasEndOfLineCharsOnly(sent_data))
+				{
+					try
+					{
+						result = api->processRequest(request);
+					}
+					catch(FileAccessException& e)
+					{
+						result = api->showError(WebEntity::INTERNAL_SERVER_ERROR, e.message());
+					}
 					state = State::FINISHED;
 					break;
 				}
 
-				int colon = sent_data.indexOf(':');
-				if (colon == -1) {					
-					writeResponse(api->showError(WebEntity::BAD_REQUEST, "Incorrect header: " + sent_data.toHex()));
+				int separator = sent_data.indexOf(':');
+				if (separator == -1) {
+					writeResponse(api->showError(WebEntity::BAD_REQUEST, "Malformed header: " + sent_data.toHex()));
 					return;
 				}
 
-				QByteArray header = sent_data.left(colon);
-				QByteArray value = sent_data.mid(colon+1);
-
-				request.headers.insert(header.toUpper(), value.trimmed());
-
-
+				request.headers.insert(sent_data.left(separator).toLower(), sent_data.mid(separator+1).trimmed());
 			}
-
 			[[fallthrough]];
 		}
 
@@ -108,16 +117,13 @@ void RequestHandler::dataReceived()
 		}
     }
 
-
-
-	QString uniqueToken = QUuid::createUuid().toString(QUuid::WithoutBraces);
-	qDebug() << uniqueToken;
+	qDebug() << "Request headers";
 	QMap<QString, QString>::const_iterator i = request.headers.constBegin();
 	while (i != request.headers.constEnd()) {
 		qDebug() << i.key() << ": " << i.value();
 		++i;
 	}
-
+	qDebug() << "";
 }
 
 void RequestHandler::writeResponse(Response response)
@@ -127,4 +133,12 @@ void RequestHandler::writeResponse(Response response)
 	socket->flush();
 	socket->close();
 	socket->deleteLater();
+}
+
+bool RequestHandler::hasEndOfLineCharsOnly(QByteArray line)
+{
+	if (line == QByteArrayLiteral("\r\n") || line == QByteArrayLiteral("\n")) {
+		return true;
+	}
+	return false;
 }

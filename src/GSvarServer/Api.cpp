@@ -13,8 +13,7 @@ Api::~Api()
 Response Api::processRequest(Request request)
 {
 	Response response {};
-	qDebug() << "PATH = ";
-	qDebug() << request.path;
+	qDebug() << "Processing path:" << request.path;
 	QList<QByteArray> path_items = request.path.split('/');
 	if (path_items.isEmpty())
 	{
@@ -31,7 +30,6 @@ Response Api::processRequest(Request request)
 		return serveStaticFile(":/assets/client/api.json", WebEntity::APPLICATION_JSON);
 	}
 
-
 	return showError(WebEntity::ErrorType::NOT_FOUND, "The page you are looking for does not exist");
 }
 
@@ -40,8 +38,8 @@ QByteArray Api::readFileContent(QString filename)
 	QByteArray content {};
 	QFile file(filename);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		qDebug() << "File has not been found";
+	{		
+		THROW(FileAccessException, "File could not be found: " + filename);
 		return content;
 	}
 

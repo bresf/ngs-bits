@@ -92,3 +92,9 @@ int WebEntity::errorCodeByType(WebEntity::ErrorType in)
 		default: return 0;
 	}
 }
+
+QString WebEntity::generateToken()
+{
+	return QUuid::createUuid().toString(QUuid::WithoutBraces);
+}
+

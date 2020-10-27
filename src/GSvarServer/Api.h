@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QFile>
 #include "WebEntity.h"
+#include "Exceptions.h"
 
 class Api : public QObject
 {

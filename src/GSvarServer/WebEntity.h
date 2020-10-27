@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QUuid>
 
 struct Request
 {
@@ -81,7 +82,7 @@ public:
 	static QString contentTypeToString(WebEntity::ContentType in);
 	static QString errorTypeToText(WebEntity::ErrorType in);
 	static int errorCodeByType(WebEntity::ErrorType in);
-
+	static QString generateToken();
 };
 
 #endif // WEBENTITY_H
