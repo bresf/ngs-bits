@@ -20,6 +20,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         Api.cpp \
         HttpsServer.cpp \
+        IncomingConnection.cpp \
         RequestHandler.cpp \
         SslServer.cpp \
         WebEntity.cpp \
@@ -33,6 +34,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Api.h \
     HttpsServer.h \
+    IncomingConnection.h \
     RequestHandler.h \
     SslServer.h \
     WebEntity.h
