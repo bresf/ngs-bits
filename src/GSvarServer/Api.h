@@ -6,6 +6,8 @@
 #include <QFile>
 #include "WebEntity.h"
 #include "Exceptions.h"
+#include "NGSD.h"
+#include "Settings.h"
 
 class Api : public QObject
 {

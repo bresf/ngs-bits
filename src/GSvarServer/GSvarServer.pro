@@ -1,7 +1,9 @@
 QT += core
 QT += network
 QT -= gui
+QT += sql
 
+QTPLUGIN += QSQLMYSQL
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -41,9 +43,9 @@ HEADERS += \
 
 include("../app_cli.pri")
 
-#include cppNGS library
-INCLUDEPATH += $$PWD/cppNGS
-LIBS += -L$$PWD/../bin -lcppNGS
+#include NGSD library
+INCLUDEPATH += $$PWD/../cppNGSD
+LIBS += -L$$PWD/../bin -lcppNGSD
 
 RESOURCES += \
     GSvarServer.qrc

@@ -1,5 +1,7 @@
 #include "Api.h"
 
+
+
 Api::Api()
 {
 
@@ -12,6 +14,34 @@ Api::~Api()
 
 Response Api::processRequest(Request request)
 {
+
+
+
+
+	try
+	{
+		NGSD db;
+
+
+		//get CNV ID
+		QStringList callset_id = db.getValues("SELECT comment FROM genome", "");
+		qDebug() << callset_id;
+
+	}
+	catch (DatabaseException& e)
+	{
+		qDebug() << e.message();
+	}
+
+
+
+
+
+
+
+
+
+
 	Response response {};
 	qDebug() << "Processing path:" << request.path;
 	QList<QByteArray> path_items = request.path.split('/');
