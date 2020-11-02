@@ -39,9 +39,7 @@ HttpsServer::HttpsServer(quint16 port)
 	else
 	{
 		qDebug() << "Could not start the HTTPS server on port #" << port << ":" << server->serverError();
-	}
-
-	api = new Api();
+	}	
 }
 
 HttpsServer::~HttpsServer()
@@ -52,7 +50,7 @@ void HttpsServer::handleConnection()
 {
     while(server->hasPendingConnections()) {
         QSslSocket *sock = server->nextPendingConnection();
-		RequestHandler *handler = new RequestHandler(sock, api);
+		RequestHandler *handler = new RequestHandler(sock);
 
 		qDebug() << "------------------------------";
 		qDebug() << "Pendingg connection!!!!!";

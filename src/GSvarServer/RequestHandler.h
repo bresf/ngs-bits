@@ -5,8 +5,9 @@
 #include <QTcpSocket>
 #include <QList>
 #include "WebEntity.h"
-#include "Api.h"
 #include "Exceptions.h"
+#include "NGSD.h"
+#include "Settings.h"
 
 
 class RequestHandler : public QObject
@@ -20,7 +21,7 @@ public:
 		FINISHED
     };
 
-	RequestHandler(QTcpSocket *socket, Api *api);
+	RequestHandler(QTcpSocket *socket);
 	~RequestHandler();
 
 private slots:
@@ -29,17 +30,13 @@ private slots:
 
 private:
     State state;
-	QTcpSocket *socket;
-	Api *api;
+	QTcpSocket *socket;	
 	Request::MethodType inferRequestMethod(QByteArray in);
 	void writeResponse(Response response);
 	bool hasEndOfLineCharsOnly(QByteArray line);
 	void handleResults(const QByteArray &headers, const QByteArray &body);
-
-//	Response showError(WebEntity::ErrorType type, QString message);
-
-	QString completness;
-
+	Request processRequest();
+	void processHeaders(Request &request);
 };
 
 #endif // REQUESTHANDLER
