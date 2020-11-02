@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QTcpSocket>
-
 #include <QList>
 #include "WebEntity.h"
 #include "Api.h"
@@ -35,7 +34,10 @@ private:
 	Request::MethodType inferRequestMethod(QByteArray in);
 	void writeResponse(Response response);
 	bool hasEndOfLineCharsOnly(QByteArray line);
-	void handleResults(const QString &s);
+	void handleResults(const QByteArray &headers, const QByteArray &body);
+
+//	Response showError(WebEntity::ErrorType type, QString message);
+
 	QString completness;
 
 };

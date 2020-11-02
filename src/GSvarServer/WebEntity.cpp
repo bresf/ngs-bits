@@ -98,3 +98,83 @@ QString WebEntity::generateToken()
 	return QUuid::createUuid().toString(QUuid::WithoutBraces);
 }
 
+QString WebEntity::getErrorPageTemplate()
+{
+	return R"html(
+			<!doctype html>
+			<html lang="en">
+				<head>
+					<meta charset="utf-8">
+					<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+					<title>%TITLE%</title>
+
+					<style>
+						html, body {
+							height: 100%;
+						}
+
+						.main-content {
+							min-height: 100%;
+							min-height: 100vh;
+							display: -webkit-box;
+							display: -moz-box;
+							display: -ms-flexbox;
+							display: -webkit-flex;
+							display: flex;
+
+							-webkit-box-align: center;
+							-webkit-align-items: center;
+							-moz-box-align: center;
+							-ms-flex-align: center;
+							align-items: center;
+
+							width: 100%;
+
+							-webkit-box-pack: center;
+							-moz-box-pack: center;
+							-ms-flex-pack: center;
+							-webkit-justify-content: center;
+							justify-content: center;
+						}
+						.data-container {
+							width: 640px;
+						}
+						pre {
+							font-size: 14px;
+						}
+					</style>
+
+				</head>
+				<body>
+					<div class="main-content">
+						<div class="data-container">
+							<h1>%TITLE%</h1>
+							<p>An error has occurred. Below you will find a short summary
+							that may help to fix it or to prevent it from happening:</p>
+							<pre>%MESSAGE%</pre>
+						</div>
+					</div>
+				</body>
+			</html>
+	)html";
+}
+
+Response WebEntity::createError(WebEntity::ErrorType type, QString message)
+{
+	QByteArray headers {};
+	QString caption = errorTypeToText(type);
+	QString body = getErrorPageTemplate();
+
+	if (message.isEmpty())
+	{
+		message	= "No information provided";
+	}
+	body.replace("%TITLE%", "Error " + QString::number(errorCodeByType(type)) + " - " + errorTypeToText(type));
+	body.replace("%MESSAGE%", message);
+
+	headers.append("HTTP/1.1 " + QString::number(errorCodeByType(type)) + " FAIL\n");
+	headers.append("Content-Length: " + QString::number(body.length()) + "\n");
+	headers.append("\n");
+
+	return Response{headers, body.toLocal8Bit()};
+}

@@ -56,7 +56,13 @@ void RequestHandler::dataReceived()
 				QList<QByteArray> sent_data_items = sent_data.split(' ');
 				if (sent_data_items.length() < 2)
 				{
-					writeResponse(api->showError(WebEntity::BAD_REQUEST, "Cannot process the request. It is possible a URL is missing or incorrect"));
+//					writeResponse(api->showError(WebEntity::BAD_REQUEST, "Cannot process the request. It is possible a URL is missing or incorrect"));
+//					WorkerThread *workerThread = new WorkerThread(this, request);
+//						connect(workerThread, &WorkerThread::resultReady, this, &RequestHandler::handleResults);
+//						connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
+//						workerThread->start();
+
+					writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Cannot process the request. It is possible a URL is missing or incorrect"));
 					return;
 				}
 
@@ -66,7 +72,9 @@ void RequestHandler::dataReceived()
 				}
 				catch (ArgumentException& e)
 				{
-					writeResponse(api->showError(WebEntity::BAD_REQUEST, e.message()));
+//					writeResponse(api->showError(WebEntity::BAD_REQUEST, e.message()));
+
+					writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, e.message()));
 					return;
 				}
 				request.path = sent_data_items[1];
@@ -75,7 +83,8 @@ void RequestHandler::dataReceived()
 			}
 			else if (socket->bytesAvailable() > MAX_REQUEST_LENGTH)
 			{
-				writeResponse(api->showError(WebEntity::BAD_REQUEST, "Maximum request lenght has been exceeded"));
+//				writeResponse(api->showError(WebEntity::BAD_REQUEST, "Maximum request lenght has been exceeded"));
+				writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Maximum request lenght has been exceeded"));
 				return;
 			}
 			[[fallthrough]];
@@ -88,28 +97,36 @@ void RequestHandler::dataReceived()
 
 				if (hasEndOfLineCharsOnly(sent_data))
 				{
-					try
-					{
-						result = api->processRequest(request);
-					}
-					catch(FileAccessException& e)
-					{
+//					try
+//					{
 
-
-						WorkerThread *workerThread = new WorkerThread(this);
+						WorkerThread *workerThread = new WorkerThread(this, request);
 							connect(workerThread, &WorkerThread::resultReady, this, &RequestHandler::handleResults);
 							connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
 							workerThread->start();
 
-//						result = api->showError(WebEntity::INTERNAL_SERVER_ERROR, e.message());
-					}
+//						result = api->processRequest(request);
+
+//					}
+//					catch(FileAccessException& e)
+//					{
+//						writeResponse(WebEntity::createError(WebEntity::INTERNAL_SERVER_ERROR, e.message()));
+//					}
+//					catch(Exception& e)
+//					{
+//						qDebug("NOT FOUND ----------------------");
+//						writeResponse(WebEntity::createError(WebEntity::NOT_FOUND, e.message()));
+//					}
+
 					state = State::FINISHED;
 					break;
 				}
 
 				int separator = sent_data.indexOf(':');
 				if (separator == -1) {
-					writeResponse(api->showError(WebEntity::BAD_REQUEST, "Malformed header: " + sent_data.toHex()));
+//					writeResponse(api->showError(WebEntity::BAD_REQUEST, "Malformed header: " + sent_data.toHex()));
+
+					writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Malformed header: " + sent_data.toHex()));
 					return;
 				}
 
@@ -151,9 +168,32 @@ bool RequestHandler::hasEndOfLineCharsOnly(QByteArray line)
 	return false;
 }
 
-void RequestHandler::handleResults(const QString &s)
+void RequestHandler::handleResults(const QByteArray &headers, const QByteArray &body)
 {
-	qDebug() << "dfdfdfdfdf" << s;
-	writeResponse(api->showError(WebEntity::BAD_REQUEST, "Malformed header: "));
+	qDebug() << "Handle results";
+	writeResponse(Response{headers, body});
 	completness = "Text";
 }
+
+//Response RequestHandler::showError(WebEntity::ErrorType type, QString message)
+//{
+//	QByteArray headers {};
+//	QString caption = WebEntity::errorTypeToText(type);
+
+
+//	QString body = WebEntity::getErrorPageTemplate(); //readFileContent(":/assets/client/error.html");
+////	QString body = QString(content);
+
+//	if (message.isEmpty())
+//	{
+//		message	= "No information provided";
+//	}
+//	body.replace("%TITLE%", "Error " + QString::number(WebEntity::errorCodeByType(type)) + " - " + WebEntity::errorTypeToText(type));
+//	body.replace("%MESSAGE%", message);
+
+//	headers.append("HTTP/1.1 " + QString::number(WebEntity::errorCodeByType(type)) + " FAIL\n");
+//	headers.append("Content-Length: " + QString::number(body.length()) + "\n");
+//	headers.append("\n");
+
+//	return Response{headers, body.toLocal8Bit()};
+//}

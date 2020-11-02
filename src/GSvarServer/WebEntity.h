@@ -83,6 +83,9 @@ public:
 	static QString errorTypeToText(WebEntity::ErrorType in);
 	static int errorCodeByType(WebEntity::ErrorType in);
 	static QString generateToken();
+	static QString getErrorPageTemplate();
+	static Response createError(WebEntity::ErrorType type, QString message);
+
 };
 
 #endif // WEBENTITY_H
