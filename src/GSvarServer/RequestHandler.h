@@ -27,6 +27,7 @@ public:
 private slots:
 	void dataReceived();
 
+
 private:
     State state;
 	QTcpSocket *socket;
@@ -34,6 +35,8 @@ private:
 	Request::MethodType inferRequestMethod(QByteArray in);
 	void writeResponse(Response response);
 	bool hasEndOfLineCharsOnly(QByteArray line);
+	void handleResults(const QString &s);
+	QString completness;
 
 };
 

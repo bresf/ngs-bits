@@ -3,6 +3,7 @@
 #include <QTcpSocket>
 #include <QSslSocket>
 #include "RequestHandler.h"
+#include "WorkerThread.h"
 
 static qint64 MAX_REQUEST_LENGTH = 2048; // for the IE compatibility
 
@@ -93,7 +94,14 @@ void RequestHandler::dataReceived()
 					}
 					catch(FileAccessException& e)
 					{
-						result = api->showError(WebEntity::INTERNAL_SERVER_ERROR, e.message());
+
+
+						WorkerThread *workerThread = new WorkerThread(this);
+							connect(workerThread, &WorkerThread::resultReady, this, &RequestHandler::handleResults);
+							connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
+							workerThread->start();
+
+//						result = api->showError(WebEntity::INTERNAL_SERVER_ERROR, e.message());
 					}
 					state = State::FINISHED;
 					break;
@@ -112,7 +120,7 @@ void RequestHandler::dataReceived()
 
 		case State::FINISHED:
 		{			
-			writeResponse(result);
+//			writeResponse(result);
 			break;
 		}
     }
@@ -141,4 +149,11 @@ bool RequestHandler::hasEndOfLineCharsOnly(QByteArray line)
 		return true;
 	}
 	return false;
+}
+
+void RequestHandler::handleResults(const QString &s)
+{
+	qDebug() << "dfdfdfdfdf" << s;
+	writeResponse(api->showError(WebEntity::BAD_REQUEST, "Malformed header: "));
+	completness = "Text";
 }

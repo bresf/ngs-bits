@@ -57,7 +57,7 @@ Response Api::processRequest(Request request)
 
 	if ((path_items[1] == QByteArrayLiteral("info")) && request.method == Request::MethodType::GET)
 	{
-		return serveStaticFile(":/assets/client/api.json", WebEntity::APPLICATION_JSON);
+		return serveStaticFile(":/assets/client/api.json1", WebEntity::APPLICATION_JSON);
 	}
 
 	return showError(WebEntity::ErrorType::NOT_FOUND, "The page you are looking for does not exist");

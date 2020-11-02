@@ -26,6 +26,7 @@ SOURCES += \
         RequestHandler.cpp \
         SslServer.cpp \
         WebEntity.cpp \
+        WorkerThread.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -39,7 +40,8 @@ HEADERS += \
     IncomingConnection.h \
     RequestHandler.h \
     SslServer.h \
-    WebEntity.h
+    WebEntity.h \
+    WorkerThread.h
 
 include("../app_cli.pri")
 
