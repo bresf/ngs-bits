@@ -14,22 +14,14 @@ class RequestHandler : public QObject
 {
     Q_OBJECT
 
-public:
-    enum State {
-		PROCESSING_REQUEST,
-		PROCESSING_HEADERS,
-		FINISHED
-    };
-
+public:    
 	RequestHandler(QTcpSocket *socket);
 	~RequestHandler();
 
 private slots:
 	void dataReceived();
 
-
 private:
-    State state;
 	QTcpSocket *socket;	
 	Request::MethodType inferRequestMethod(QByteArray in);
 	void writeResponse(Response response);

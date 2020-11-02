@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include <QUuid>
+#include <QDebug>
 
 struct Request
 {

@@ -161,6 +161,8 @@ QString WebEntity::getErrorPageTemplate()
 
 Response WebEntity::createError(WebEntity::ErrorType type, QString message)
 {
+	qDebug() << "An error has been detected:" << message;
+
 	QByteArray headers {};
 	QString caption = errorTypeToText(type);
 	QString body = getErrorPageTemplate();

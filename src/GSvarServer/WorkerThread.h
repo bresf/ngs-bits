@@ -11,7 +11,7 @@ class WorkerThread : public QThread
 {
 	Q_OBJECT
 public:
-	explicit WorkerThread(QObject *parent, Request request);
+	explicit WorkerThread(Request request);
 	void run();
 
 private:
