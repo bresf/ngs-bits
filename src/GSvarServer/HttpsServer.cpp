@@ -12,13 +12,15 @@
 HttpsServer::HttpsServer(quint16 port)
 {
 	QFile certFile(":/assets/ssl/dev-cert.crt");
-    if (!certFile.open(QIODevice::ReadOnly)) {
+	if (!certFile.open(QIODevice::ReadOnly))
+	{
         qDebug() << "Unable to load certificate";
         return;
     }
 
 	QFile keyFile(":/assets/ssl/dev-key.key");
-    if (!keyFile.open(QIODevice::ReadOnly)) {
+	if (!keyFile.open(QIODevice::ReadOnly))
+	{
         qDebug() << "Unable to load key";
         return;
     }
@@ -33,7 +35,8 @@ HttpsServer::HttpsServer(quint16 port)
     config.setLocalCertificate(cert);
     config.setPrivateKey(key);
     server->setSslConfiguration(config);
-	if (server->listen(QHostAddress::Any, port)) {
+	if (server->listen(QHostAddress::Any, port))
+	{
 		qDebug() << "HTTPS server is running on port #" << port;		
 	}
 	else
@@ -48,12 +51,9 @@ HttpsServer::~HttpsServer()
 
 void HttpsServer::handleConnection()
 {
-    while(server->hasPendingConnections()) {
+	while(server->hasPendingConnections())
+	{
         QSslSocket *sock = server->nextPendingConnection();
 		RequestHandler *handler = new RequestHandler(sock);
-
-		qDebug() << "------------------------------";
-		qDebug() << "Pendingg connection!!!!!";
-		qDebug() << "------------------------------";
     }
 }

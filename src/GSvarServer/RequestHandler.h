@@ -9,12 +9,13 @@
 #include "NGSD.h"
 #include "Settings.h"
 
+Q_DECLARE_METATYPE(Response)
 
 class RequestHandler : public QObject
 {
     Q_OBJECT
 
-public:    
+public:
 	RequestHandler(QTcpSocket *socket);
 	~RequestHandler();
 
@@ -26,7 +27,7 @@ private:
 	Request::MethodType inferRequestMethod(QByteArray in);
 	void writeResponse(Response response);
 	bool hasEndOfLineCharsOnly(QByteArray line);
-	void handleResults(const QByteArray &headers, const QByteArray &body);
+	void handleResults(const Response &response);
 	Request processRequest();
 	void processHeaders(Request &request);
 };

@@ -10,6 +10,7 @@ static qint64 MAX_REQUEST_LENGTH = 2048; // for the IE compatibility
 RequestHandler::RequestHandler(QTcpSocket *sock)
 	: socket(sock)
 {
+	qRegisterMetaType<Response>();
 	connect(sock, SIGNAL(readyRead()), this, SLOT(dataReceived()));
 }
 
@@ -19,19 +20,24 @@ RequestHandler::~RequestHandler()
 
 Request::MethodType RequestHandler::inferRequestMethod(QByteArray in)
 {
-	if (in.toUpper() == QByteArrayLiteral("GET")) {
+	if (in.toUpper() == QByteArrayLiteral("GET"))
+	{
 		return Request::MethodType::GET;
 	}
-	if (in.toUpper() == QByteArrayLiteral("POST")) {
+	if (in.toUpper() == QByteArrayLiteral("POST"))
+	{
 		return Request::MethodType::POST;
 	}
-	if (in.toUpper() == QByteArrayLiteral("DELETE")) {
+	if (in.toUpper() == QByteArrayLiteral("DELETE"))
+	{
 		return Request::MethodType::DELETE;
 	}
-	if (in.toUpper() == QByteArrayLiteral("PUT")) {
+	if (in.toUpper() == QByteArrayLiteral("PUT"))
+	{
 		return Request::MethodType::PUT;
 	}
-	if (in.toUpper() == QByteArrayLiteral("PATCH")) {
+	if (in.toUpper() == QByteArrayLiteral("PATCH"))
+	{
 		return Request::MethodType::PATCH;
 	}
 
@@ -43,7 +49,8 @@ Request RequestHandler::processRequest()
 	Request request {};
 	request.remote_address = socket->peerAddress().toString();
 
-	if (socket->canReadLine()) {
+	if (socket->canReadLine())
+	{
 		QByteArray sent_data = socket->readLine();
 
 		QList<QByteArray> sent_data_items = sent_data.split(' ');
@@ -79,7 +86,6 @@ void RequestHandler::processHeaders(Request &request)
 
 		if (hasEndOfLineCharsOnly(sent_data))
 		{
-
 			WorkerThread *workerThread = new WorkerThread(request);
 			connect(workerThread, &WorkerThread::resultReady, this, &RequestHandler::handleResults);
 			connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
@@ -122,7 +128,8 @@ void RequestHandler::dataReceived()
 
 	qDebug() << "Request headers";
 	QMap<QString, QString>::const_iterator i = request.headers.constBegin();
-	while (i != request.headers.constEnd()) {
+	while (i != request.headers.constEnd())
+	{
 		qDebug() << i.key() << ": " << i.value();
 		++i;
 	}
@@ -140,13 +147,14 @@ void RequestHandler::writeResponse(Response response)
 
 bool RequestHandler::hasEndOfLineCharsOnly(QByteArray line)
 {
-	if (line == QByteArrayLiteral("\r\n") || line == QByteArrayLiteral("\n")) {
+	if (line == QByteArrayLiteral("\r\n") || line == QByteArrayLiteral("\n"))
+	{
 		return true;
 	}
 	return false;
 }
 
-void RequestHandler::handleResults(const QByteArray &headers, const QByteArray &body)
+void RequestHandler::handleResults(const Response &response)
 {
-	writeResponse(Response{headers, body});
+	writeResponse(response);
 }

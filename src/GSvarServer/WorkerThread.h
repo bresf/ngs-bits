@@ -17,10 +17,13 @@ public:
 private:
 	QByteArray readFileContent(QString filename);
 	QByteArray generateHeaders(int length, WebEntity::ContentType type);
+	QList<QByteArray> getKeyValuePair(QByteArray in);
+	QMap<QString, QString> getVariables(QByteArray in);
+	QByteArray getVariableSequence(QByteArray url);
 	Request request_;
 
 signals:
-	void resultReady(const QByteArray &headers, const QByteArray &body);
+	void resultReady(const Response &response);
 };
 
 #endif // WORKERTHREAD_H
