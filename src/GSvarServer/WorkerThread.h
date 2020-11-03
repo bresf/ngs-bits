@@ -15,11 +15,14 @@ public:
 	void run();
 
 private:
+	QString getFileNameAndExtension(QString filename_with_path);
 	QByteArray readFileContent(QString filename);
-	QByteArray generateHeaders(int length, WebEntity::ContentType type);
+	Response serverStaticFile(QString filename, WebEntity::ContentType type, bool is_downloadable);
+	QByteArray generateHeaders(QString filename, int length, WebEntity::ContentType type, bool is_downloadable);
 	QList<QByteArray> getKeyValuePair(QByteArray in);
 	QMap<QString, QString> getVariables(QByteArray in);
 	QByteArray getVariableSequence(QByteArray url);
+	QString getUrlPartWithoutParams(QByteArray url);
 	Request request_;
 
 signals:
