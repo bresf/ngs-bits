@@ -14,7 +14,7 @@ FileCache& FileCache::instance()
 void FileCache::addFileToCache(QString id, QString filename_with_path, QByteArray content)
 {
 	instance().mutex_.lock();
-	instance().file_cache_.insert(id, CacheItem{filename_with_path, content});
+	instance().file_cache_.insert(id, CacheItem{filename_with_path, QDateTime::currentDateTime(), content});
 	instance().mutex_.unlock();
 }
 

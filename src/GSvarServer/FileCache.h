@@ -4,10 +4,12 @@
 #include <QMap>
 #include <QDebug>
 #include <QMutex>
+#include <QDateTime>
 
 struct CacheItem
 {
 	QString filename_with_path;
+	QDateTime modified;
 	QByteArray content;
 };
 
