@@ -1,7 +1,6 @@
 #ifndef FILECACHE_H
 #define FILECACHE_H
 
-#include <QObject>
 #include <QMutex>
 #include <QMap>
 #include <QDebug>

@@ -2,12 +2,12 @@
 
 WebEntity::WebEntity()
 {
-
 }
 
-WebEntity::~WebEntity()
+WebEntity& WebEntity::instance()
 {
-
+	static WebEntity web_entity;
+	return web_entity;
 }
 
 QString WebEntity::contentTypeToString(WebEntity::ContentType in)
@@ -112,7 +112,9 @@ QString WebEntity::getErrorPageTemplate()
 						html, body {
 							height: 100%;
 						}
-
+						.centered {
+							text-align: center;
+						}
 						.main-content {
 							min-height: 100%;
 							min-height: 100vh;
@@ -148,10 +150,17 @@ QString WebEntity::getErrorPageTemplate()
 				<body>
 					<div class="main-content">
 						<div class="data-container">
-							<h1>%TITLE%</h1>
+							<h1 class="centered">%TITLE%</h1>
 							<p>An error has occurred. Below you will find a short summary
 							that may help to fix it or to prevent it from happening:</p>
 							<pre>%MESSAGE%</pre>
+							<pre class="centered">
+O       o O       o O       o
+| O   o | | O   o | | O   o |
+| | O | | | | O | | | | O | |
+| o   O | | o   O | | o   O |
+o       O o       O o       O
+							</pre>
 						</div>
 					</div>
 				</body>

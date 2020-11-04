@@ -1,7 +1,6 @@
 #ifndef REQUESTENTITY_H
 #define REQUESTENTITY_H
 
-#include <QObject>
 #include <QMap>
 #include <QUuid>
 #include <QDebug>
@@ -30,10 +29,8 @@ struct Response
 	QByteArray body;
 };
 
-class WebEntity : public QObject
+class WebEntity
 {
-	Q_OBJECT
-
 public:
 	enum ContentType
 	{
@@ -77,8 +74,7 @@ public:
 		UNKNOWN_ERROR
 	};
 
-	WebEntity();
-	~WebEntity();
+
 
 	static QString contentTypeToString(WebEntity::ContentType in);
 	static QString errorTypeToText(WebEntity::ErrorType in);
@@ -87,6 +83,9 @@ public:
 	static QString getErrorPageTemplate();
 	static Response createError(WebEntity::ErrorType type, QString message);
 
+private:
+	WebEntity();
+	static WebEntity& instance();
 };
 
 #endif // WEBENTITY_H
