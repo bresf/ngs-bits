@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMutex>
 #include <QMap>
+#include <QDebug>
 
 QMutex mutex;
 
@@ -13,20 +14,17 @@ struct CacheItem
 	QByteArray content;
 };
 
-class FileCache : public QObject
+class FileCache
 {
-	Q_OBJECT
-
-public:
-	FileCache();
-	~FileCache();
-
-	void addFileToCache(QString id, QString filename_with_path, QByteArray content);
-	void removeFileFromCache(QString id);
-	bool isInCacheAlready(QString filename_with_path);
-	CacheItem getFileById(QString id);
+public:	
+	static void addFileToCache(QString id, QString filename_with_path, QByteArray content);
+	static void removeFileFromCache(QString id);
+	static bool isInCacheAlready(QString filename_with_path);
+	static CacheItem getFileById(QString id);
 
 private:
+	FileCache();
+	static FileCache& instance();
 	QMap<QString, CacheItem> file_cache_;
 };
 
