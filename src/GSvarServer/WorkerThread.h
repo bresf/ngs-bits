@@ -6,6 +6,7 @@
 #include <QDebug>
 #include "Exceptions.h"
 #include "WebEntity.h"
+#include "FileCache.h"
 
 class WorkerThread : public QThread
 {

@@ -1,11 +1,9 @@
 #ifndef FILECACHE_H
 #define FILECACHE_H
 
-#include <QMutex>
 #include <QMap>
 #include <QDebug>
-
-QMutex mutex;
+#include <QMutex>
 
 struct CacheItem
 {
@@ -18,10 +16,12 @@ class FileCache
 public:	
 	static void addFileToCache(QString id, QString filename_with_path, QByteArray content);
 	static void removeFileFromCache(QString id);
+	static QString getFileIdIfInCache(QString filename_with_path);
 	static bool isInCacheAlready(QString filename_with_path);
 	static CacheItem getFileById(QString id);
 
 private:
+	QMutex mutex_;
 	FileCache();
 	static FileCache& instance();
 	QMap<QString, CacheItem> file_cache_;

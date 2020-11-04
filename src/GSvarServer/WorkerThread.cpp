@@ -8,8 +8,16 @@ WorkerThread::WorkerThread(Request request)
 QByteArray WorkerThread::readFileContent(QString filename_with_path)
 {
 	qDebug() << "Reading file:" << filename_with_path;
-
 	QByteArray content {};
+
+	QString found_id = FileCache::getFileIdIfInCache(filename_with_path);
+	if (found_id.length() > 0)
+	{
+		qDebug() << "File has been found in the cache:" << found_id;
+		return FileCache::getFileById(found_id).content;
+	}
+
+
 	QFile file(filename_with_path);
 	if (!file.open(QIODevice::ReadOnly))
 	{
@@ -20,6 +28,9 @@ QByteArray WorkerThread::readFileContent(QString filename_with_path)
 	{
 		content = file.readAll();
 	}
+
+	qDebug() << "Adding file to the cache:" << filename_with_path;
+	FileCache::addFileToCache(WebEntity::generateToken(), filename_with_path, content);
 	return content;
 }
 
