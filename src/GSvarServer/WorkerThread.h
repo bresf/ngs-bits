@@ -20,9 +20,6 @@ private:
 	QByteArray readFileContent(QString filename);
 	Response serverStaticFile(QString filename, WebEntity::ContentType type, bool is_downloadable);
 	QByteArray generateHeaders(QString filename, int length, WebEntity::ContentType type, bool is_downloadable);
-	QList<QByteArray> getKeyValuePair(QByteArray in);
-	QMap<QString, QString> getVariables(QByteArray in);
-	QByteArray getVariableSequence(QByteArray url);
 	QString getUrlPartWithoutParams(QByteArray url);
 	Request request_;
 

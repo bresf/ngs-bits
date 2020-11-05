@@ -44,65 +44,119 @@ Request::MethodType RequestHandler::inferRequestMethod(QByteArray in)
 	THROW(ArgumentException, "Incorrect request method");
 }
 
-Request RequestHandler::processRequest()
+QList<QByteArray> RequestHandler::getRequestBody()
 {
-	Request request {};
-	request.remote_address = socket->peerAddress().toString();
+	QList<QByteArray> request_items;
 
 	if (socket->canReadLine())
 	{
-		QByteArray sent_data = socket->readLine();
-
-		QList<QByteArray> sent_data_items = sent_data.split(' ');
-		if (sent_data_items.length() < 2)
+		request_items = socket->readAll().split('\n');
+		for (int i = 0; i < request_items.count(); ++i)
 		{
-			writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Cannot process the request. It is possible a URL is missing or incorrect"));
+			request_items[i] = request_items[i].trimmed();
 		}
-
-		try
-		{
-			request.method = inferRequestMethod(sent_data_items[0].toUpper());
-		}
-		catch (ArgumentException& e)
-		{
-			writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, e.message()));
-		}
-		request.path = sent_data_items[1];
-
-		return request;
 	}
 	else if (socket->bytesAvailable() > MAX_REQUEST_LENGTH)
 	{
 		writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Maximum request lenght has been exceeded"));
 	}
-	return request;
+
+	return request_items;
 }
 
-void RequestHandler::processHeaders(Request &request)
+QList<QByteArray> RequestHandler::getKeyValuePair(QByteArray in)
 {
-	while (socket->canReadLine())
+	QList<QByteArray> result {};
+
+	if (in.indexOf('=')>-1)
 	{
-		QByteArray sent_data = socket->readLine();
-
-		if (hasEndOfLineCharsOnly(sent_data))
-		{
-			WorkerThread *workerThread = new WorkerThread(request);
-			connect(workerThread, &WorkerThread::resultReady, this, &RequestHandler::handleResults);
-			connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
-			workerThread->start();
-
-			break;
-		}
-
-		int separator = sent_data.indexOf(':');
-		if (separator == -1)
-		{
-			writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Malformed header: " + sent_data.toHex()));
-			return;
-		}
-
-		request.headers.insert(sent_data.left(separator).toLower(), sent_data.mid(separator+1).trimmed());
+		result = in.split('=');
 	}
+
+	return result;
+}
+
+QMap<QString, QString> RequestHandler::getVariables(QByteArray in)
+{
+	QMap<QString, QString> url_vars {};
+	QList<QByteArray> var_list = in.split('&');
+	QByteArray cur_key {};
+
+	for (int i = 0; i < var_list.count(); ++i)
+	{
+		QList<QByteArray> pair = getKeyValuePair(var_list[i]);
+		if (pair.length()==2)
+		{
+			url_vars.insert(pair[0], pair[1]);
+		}
+	}
+
+	return url_vars;
+}
+
+QByteArray RequestHandler::getVariableSequence(QByteArray url)
+{
+	QByteArray var_string {};
+	if (url.indexOf('?') == -1) return var_string;
+	return url.split('?')[1];
+}
+
+Request RequestHandler::parseRequestBody(QList<QByteArray> body)
+{
+	Request request {};
+	request.remote_address = socket->peerAddress().toString();
+
+	for (int i = 0; i < body.count(); ++i)
+	{
+		qDebug() << body[i];
+		// First line with method type and URL
+		if (i == 0)
+		{
+			QList<QByteArray> request_info = body[i].split(' ');
+			if (request_info.length() < 2)
+			{
+				writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Cannot process the request. It is possible a URL is missing or incorrect"));
+			}
+			try
+			{
+				request.method = inferRequestMethod(request_info[0].toUpper());
+			}
+			catch (ArgumentException& e)
+			{
+				writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, e.message()));
+			}
+			request.path = request_info[1];
+			request.url_params = getVariables(getVariableSequence(request_info[1]));
+			continue;
+		}
+
+		// Reading headers and params
+		int header_separator = body[i].indexOf(':');
+		int param_separator = body[i].indexOf('=');
+		if ((header_separator == -1) && (param_separator == -1) && (body[i].length() > 0))
+		{
+			writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Malformed element: " + body[i]));
+			return request;
+		}
+
+		if (header_separator > -1)
+		{
+			request.headers.insert(body[i].left(header_separator).toLower(), body[i].mid(header_separator+1).trimmed());
+		}
+		else if (param_separator > -1)
+		{
+			request.form_urlencoded = getVariables(body[i]);
+		}
+	}
+
+
+	WorkerThread *workerThread = new WorkerThread(request);
+	connect(workerThread, &WorkerThread::resultReady, this, &RequestHandler::handleResults);
+	connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
+	workerThread->start();
+
+
+	return request;
 }
 
 void RequestHandler::dataReceived()
@@ -123,8 +177,7 @@ void RequestHandler::dataReceived()
 		qDebug() << e.message();
 	}
 
-	Request request = processRequest();
-	processHeaders(request);
+	Request request = parseRequestBody(getRequestBody());
 
 	qDebug() << "Request headers";
 	QMap<QString, QString>::const_iterator i = request.headers.constBegin();
@@ -133,7 +186,11 @@ void RequestHandler::dataReceived()
 		qDebug() << i.key() << ": " << i.value();
 		++i;
 	}
+	qDebug() << "URL params: " << request.url_params;
+	qDebug() << "Form: " << request.form_urlencoded;
 	qDebug() << "";
+
+
 }
 
 void RequestHandler::writeResponse(Response response)

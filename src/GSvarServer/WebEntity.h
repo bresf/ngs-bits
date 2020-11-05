@@ -19,8 +19,8 @@ struct Request
 	QMap<QString, QString> headers;
 	QByteArray path;
 	QString remote_address;
-	QMap<QString, QString> payload;
-
+	QMap<QString, QString> url_params;
+	QMap<QString, QString> form_urlencoded;
 };
 
 struct Response

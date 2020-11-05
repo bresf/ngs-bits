@@ -67,43 +67,6 @@ QByteArray WorkerThread::generateHeaders(QString filename, int length, WebEntity
 	return headers;
 }
 
-QList<QByteArray> WorkerThread::getKeyValuePair(QByteArray in)
-{
-	QList<QByteArray> result {};
-
-	if (in.indexOf('=')>-1)
-	{
-		result = in.split('=');
-	}
-
-	return result;
-}
-
-QMap<QString, QString> WorkerThread::getVariables(QByteArray in)
-{
-	QMap<QString, QString> url_vars {};
-	QList<QByteArray> var_list = in.split('&');
-	QByteArray cur_key {};
-
-	for (int i = 0; i < var_list.count(); ++i)
-	{
-		QList<QByteArray> pair = getKeyValuePair(var_list[i]);
-		if (pair.length()==2)
-		{
-			url_vars.insert(pair[0], pair[1]);
-		}
-	}
-
-	return url_vars;
-}
-
-QByteArray WorkerThread::getVariableSequence(QByteArray url)
-{
-	QByteArray var_string {};
-	if (url.indexOf('?') == -1) return var_string;
-	return url.split('?')[1];
-}
-
 QString WorkerThread::getUrlPartWithoutParams(QByteArray url)
 {
 	QList<QByteArray> url_parts = url.split('?');
@@ -123,7 +86,7 @@ void WorkerThread::run()
 	}
 
 	QString first_url_part = getUrlPartWithoutParams(path_items[1]);
-	QMap<QString, QString> url_vars = getVariables(getVariableSequence(path_items[1]));
+	QMap<QString, QString> url_vars = request_.url_params;
 	qDebug() << "Variables from the request URL:" << url_vars;
 
 	// index page

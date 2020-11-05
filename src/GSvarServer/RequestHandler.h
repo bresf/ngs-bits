@@ -28,8 +28,11 @@ private:
 	void writeResponse(Response response);
 	bool hasEndOfLineCharsOnly(QByteArray line);
 	void handleResults(const Response &response);
-	Request processRequest();
-	void processHeaders(Request &request);
+	QList<QByteArray> getRequestBody();
+	QList<QByteArray> getKeyValuePair(QByteArray in);
+	QMap<QString, QString> getVariables(QByteArray in);
+	QByteArray getVariableSequence(QByteArray url);
+	Request parseRequestBody(QList<QByteArray> body);
 };
 
 #endif // REQUESTHANDLER
