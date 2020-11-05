@@ -67,10 +67,34 @@ QByteArray WorkerThread::generateHeaders(QString filename, int length, WebEntity
 	return headers;
 }
 
+QByteArray WorkerThread::generateHeaders(int length, WebEntity::ContentType type)
+{
+	return generateHeaders("", length, type, false);
+}
+
 QString WorkerThread::getUrlPartWithoutParams(QByteArray url)
 {
 	QList<QByteArray> url_parts = url.split('?');
 	return QString(url_parts[0]);
+}
+
+bool WorkerThread::isValidUser(QString user_id, QString password)
+{
+	try
+	{
+		NGSD db;
+		QString user_password = db.getValue("SELECT password FROM user WHERE user_id=:0", true, user_id).toByteArray();
+		if (user_password == password)
+		{
+			return true;
+		}
+	}
+	catch (DatabaseException& e)
+	{
+		qDebug() << e.message();
+		emit resultReady(WebEntity::createError(WebEntity::INTERNAL_SERVER_ERROR, e.message()));
+	}
+	return false;
 }
 
 void WorkerThread::run()
@@ -109,12 +133,20 @@ void WorkerThread::run()
 		return;
 	}
 
-	Response response = WebEntity::createError(WebEntity::NOT_FOUND, "The page you are looking for does not exist");
-	if (request_.method != Request::MethodType::GET)
+	if ((first_url_part == "login") && request_.method == Request::MethodType::POST)
 	{
-		response = WebEntity::createError(WebEntity::NOT_IMPLEMENTED, "Only GET requests are supported at the moment");
+		if (isValidUser(request_.form_urlencoded["name"], request_.form_urlencoded["password"]))
+		{
+			body = WebEntity::generateToken().toLocal8Bit();
+			emit resultReady(Response{generateHeaders(body.length(), WebEntity::TEXT_PLAIN), body});
+			return;
+		}
+
+		emit resultReady(WebEntity::createError(WebEntity::UNAUTHORIZED, "Invalid username or password"));
+		return;
 	}
-	emit resultReady(response);
+
+	emit resultReady(WebEntity::createError(WebEntity::NOT_FOUND, "This page does not exist. Check the URL and try again"));
 }
 
 QString WorkerThread::getFileNameAndExtension(QString filename_with_path)

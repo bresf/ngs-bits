@@ -7,6 +7,7 @@
 #include "Exceptions.h"
 #include "WebEntity.h"
 #include "FileCache.h"
+#include "NGSD.h"
 
 class WorkerThread : public QThread
 {
@@ -20,7 +21,9 @@ private:
 	QByteArray readFileContent(QString filename);
 	Response serverStaticFile(QString filename, WebEntity::ContentType type, bool is_downloadable);
 	QByteArray generateHeaders(QString filename, int length, WebEntity::ContentType type, bool is_downloadable);
+	QByteArray generateHeaders(int length, WebEntity::ContentType type);
 	QString getUrlPartWithoutParams(QByteArray url);
+	bool isValidUser(QString name, QString password);
 	Request request_;
 
 signals:

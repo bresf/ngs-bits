@@ -4,10 +4,15 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QList>
+#include <QDebug>
+#include <QHostAddress>
+#include <QSslSocket>
 #include "WebEntity.h"
 #include "Exceptions.h"
 #include "NGSD.h"
 #include "Settings.h"
+#include "WorkerThread.h"
+
 
 Q_DECLARE_METATYPE(Response)
 
@@ -32,7 +37,7 @@ private:
 	QList<QByteArray> getKeyValuePair(QByteArray in);
 	QMap<QString, QString> getVariables(QByteArray in);
 	QByteArray getVariableSequence(QByteArray url);
-	Request parseRequestBody(QList<QByteArray> body);
+	void processRequest(QList<QByteArray> body);
 };
 
 #endif // REQUESTHANDLER

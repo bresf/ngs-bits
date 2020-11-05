@@ -1,9 +1,4 @@
-#include <QDebug>
-#include <QHostAddress>
-#include <QTcpSocket>
-#include <QSslSocket>
 #include "RequestHandler.h"
-#include "WorkerThread.h"
 
 static qint64 MAX_REQUEST_LENGTH = 2048; // for the IE compatibility
 
@@ -101,14 +96,13 @@ QByteArray RequestHandler::getVariableSequence(QByteArray url)
 	return url.split('?')[1];
 }
 
-Request RequestHandler::parseRequestBody(QList<QByteArray> body)
+void RequestHandler::processRequest(QList<QByteArray> body)
 {
 	Request request {};
 	request.remote_address = socket->peerAddress().toString();
 
 	for (int i = 0; i < body.count(); ++i)
 	{
-		qDebug() << body[i];
 		// First line with method type and URL
 		if (i == 0)
 		{
@@ -116,6 +110,7 @@ Request RequestHandler::parseRequestBody(QList<QByteArray> body)
 			if (request_info.length() < 2)
 			{
 				writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Cannot process the request. It is possible a URL is missing or incorrect"));
+				return;
 			}
 			try
 			{
@@ -124,6 +119,7 @@ Request RequestHandler::parseRequestBody(QList<QByteArray> body)
 			catch (ArgumentException& e)
 			{
 				writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, e.message()));
+				return;
 			}
 			request.path = request_info[1];
 			request.url_params = getVariables(getVariableSequence(request_info[1]));
@@ -136,7 +132,7 @@ Request RequestHandler::parseRequestBody(QList<QByteArray> body)
 		if ((header_separator == -1) && (param_separator == -1) && (body[i].length() > 0))
 		{
 			writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, "Malformed element: " + body[i]));
-			return request;
+			return;
 		}
 
 		if (header_separator > -1)
@@ -149,36 +145,6 @@ Request RequestHandler::parseRequestBody(QList<QByteArray> body)
 		}
 	}
 
-
-	WorkerThread *workerThread = new WorkerThread(request);
-	connect(workerThread, &WorkerThread::resultReady, this, &RequestHandler::handleResults);
-	connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
-	workerThread->start();
-
-
-	return request;
-}
-
-void RequestHandler::dataReceived()
-{
-	qDebug() << "New request received";
-	try
-	{
-		NGSD db;
-
-
-		//get CNV ID
-		QStringList callset_id = db.getValues("SELECT comment FROM genome", "");
-		qDebug() << callset_id;
-
-	}
-	catch (DatabaseException& e)
-	{
-		qDebug() << e.message();
-	}
-
-	Request request = parseRequestBody(getRequestBody());
-
 	qDebug() << "Request headers";
 	QMap<QString, QString>::const_iterator i = request.headers.constBegin();
 	while (i != request.headers.constEnd())
@@ -190,7 +156,17 @@ void RequestHandler::dataReceived()
 	qDebug() << "Form: " << request.form_urlencoded;
 	qDebug() << "";
 
+	// Executing in a separate thread
+	WorkerThread *workerThread = new WorkerThread(request);
+	connect(workerThread, &WorkerThread::resultReady, this, &RequestHandler::handleResults);
+	connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
+	workerThread->start();
+}
 
+void RequestHandler::dataReceived()
+{
+	qDebug() << "New request received";	
+	processRequest(getRequestBody());
 }
 
 void RequestHandler::writeResponse(Response response)
