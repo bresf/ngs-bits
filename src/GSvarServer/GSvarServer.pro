@@ -23,6 +23,7 @@ SOURCES += \
         FileCache.cpp \
         HttpsServer.cpp \
         RequestHandler.cpp \
+        SessionManager.cpp \
         SslServer.cpp \
         WebEntity.cpp \
         WorkerThread.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     FileCache.h \
     HttpsServer.h \
     RequestHandler.h \
+    SessionManager.h \
     SslServer.h \
     WebEntity.h \
     WorkerThread.h

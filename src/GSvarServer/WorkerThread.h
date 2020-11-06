@@ -8,6 +8,7 @@
 #include "WebEntity.h"
 #include "FileCache.h"
 #include "NGSD.h"
+#include "SessionManager.h"
 
 class WorkerThread : public QThread
 {

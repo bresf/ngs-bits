@@ -83,11 +83,16 @@ bool WorkerThread::isValidUser(QString user_id, QString password)
 	try
 	{
 		NGSD db;
-		QString user_password = db.getValue("SELECT password FROM user WHERE user_id=:0", true, user_id).toByteArray();
-		if (user_password == password)
+		QString message = db.checkPassword(user_id, password, true);
+		if (message.isEmpty())
 		{
 			return true;
 		}
+		else
+		{
+			return false;
+		}
+
 	}
 	catch (DatabaseException& e)
 	{
@@ -116,6 +121,7 @@ void WorkerThread::run()
 	// index page
 	if ((first_url_part == "") && request_.method == Request::MethodType::GET)
 	{
+		qDebug() << "Valid user: " << SessionManager::hasValidToken("alex");
 		emit resultReady(serverStaticFile(":/assets/client/info.html", WebEntity::TEXT_HTML, false));
 		return;
 	}
@@ -137,7 +143,11 @@ void WorkerThread::run()
 	{
 		if (isValidUser(request_.form_urlencoded["name"], request_.form_urlencoded["password"]))
 		{
-			body = WebEntity::generateToken().toLocal8Bit();
+			QString secure_token = WebEntity::generateToken();
+			Session cur_session = Session{request_.form_urlencoded["name"], secure_token, QDateTime::currentDateTime()};
+
+			SessionManager::addNewSession(WebEntity::generateToken(), cur_session);
+			body = secure_token.toLocal8Bit();
 			emit resultReady(Response{generateHeaders(body.length(), WebEntity::TEXT_PLAIN), body});
 			return;
 		}

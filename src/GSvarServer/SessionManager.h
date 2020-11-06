@@ -1,0 +1,31 @@
+#ifndef SESSIONMANAGER_H
+#define SESSIONMANAGER_H
+
+#include <QMap>
+#include <QDebug>
+#include <QDateTime>
+#include <QMutex>
+
+struct Session
+{
+	QString user_id;
+	QString secure_token;
+	QDateTime login_time;
+};
+
+class SessionManager
+{
+public:
+	static void addNewSession(QString id, Session in);
+	static void removeSession(QString id);
+	static Session getSessionByUserId(QString id);
+	static bool hasValidToken(QString id);
+
+private:
+	QMutex mutex_;
+	SessionManager();
+	static SessionManager& instance();
+	QMap<QString, Session> session_store_;
+};
+
+#endif // SESSIONMANAGER_H
