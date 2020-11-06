@@ -18,6 +18,7 @@ public:
 	void run();
 
 private:
+	bool isEligibileToAccess();
 	QString getFileNameAndExtension(QString filename_with_path);
 	QByteArray readFileContent(QString filename);
 	Response serverStaticFile(QString filename, WebEntity::ContentType type, bool is_downloadable);

@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QMutex>
+#include "Settings.h"
+#include "Exceptions.h"
 
 struct Session
 {
@@ -17,13 +19,17 @@ class SessionManager
 {
 public:
 	static void addNewSession(QString id, Session in);
+	static QString getSessionIdBySecureToken(QString token);
 	static void removeSession(QString id);
 	static Session getSessionByUserId(QString id);
+	static Session getSessionBySecureToken(QString token);
 	static bool hasValidToken(QString id);
+	static bool isTokenValid(QString token);
 
 private:
 	QMutex mutex_;
 	SessionManager();
+	static bool isSessionExpired(Session in);
 	static SessionManager& instance();
 	QMap<QString, Session> session_store_;
 };

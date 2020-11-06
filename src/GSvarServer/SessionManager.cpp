@@ -26,6 +26,23 @@ void SessionManager::removeSession(QString id)
 		instance().session_store_.remove(id);
 		instance().mutex_.unlock();
 	}
+	else
+	{
+		THROW(ArgumentException, "Secure token could not be found");
+	}
+}
+
+QString SessionManager::getSessionIdBySecureToken(QString token)
+{
+	QMapIterator<QString, Session> i(instance().session_store_);
+	while (i.hasNext()) {
+		i.next();
+		if (i.value().secure_token == token)
+		{
+			return i.key();
+		}
+	}
+	return "";
 }
 
 Session SessionManager::getSessionByUserId(QString id)
@@ -41,16 +58,37 @@ Session SessionManager::getSessionByUserId(QString id)
 	return Session{};
 }
 
-bool SessionManager::hasValidToken(QString id)
+Session SessionManager::getSessionBySecureToken(QString token)
 {
-	Session found_session = getSessionByUserId(id);
-	qint64 login_time = found_session.login_time.toSecsSinceEpoch();
-	//qint64 valid_period = 60*60*35; // 35 hours in seconds
-	qint64 valid_period = 10;
+	QMapIterator<QString, Session> i(instance().session_store_);
+	while (i.hasNext()) {
+		i.next();
+		if (i.value().secure_token == token)
+		{
+			return i.value();
+		}
+	}
+	return Session{};
+}
+
+bool SessionManager::isSessionExpired(Session in)
+{
+	qint64 login_time = in.login_time.toSecsSinceEpoch();
+	qint64 valid_period = Settings::integer("session_duration");
 
 	if ((login_time + valid_period) > QDateTime::currentDateTime().toSecsSinceEpoch())
 	{
 		return true;
 	}
 	return false;
+}
+
+bool SessionManager::isTokenValid(QString token)
+{
+	return isSessionExpired(getSessionBySecureToken(token));
+}
+
+bool SessionManager::hasValidToken(QString user_id)
+{
+	return isSessionExpired(getSessionByUserId(user_id));
 }
