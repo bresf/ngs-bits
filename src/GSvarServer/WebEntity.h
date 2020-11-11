@@ -113,9 +113,9 @@ private:
 	static WebEntity& instance();
 
 	const QList<QString> BINARY_EXT = {"bam", "exe"};
-	const QList<QString> CODE_EXT = {"xml", "html"};
+	const QList<QString> CODE_EXT = {"xml", "html", "yml"};
 	const QList<QString> PICTURE_EXT = {"jpg", "jpeg", "png", "gif", "svg"};
-	const QList<QString> TEXT_EXT = {"txt", "rtf", "doc", "docx"};
+	const QList<QString> TEXT_EXT = {"txt", "ini", "rtf", "doc", "docx"};
 	const QList<QString> TABLE_EXT = {"csv", "xls", "xlsx"};
 
 	static QString getPageHeader();

@@ -58,12 +58,13 @@ Response WorkerThread::serveFolderContent(QString folder)
 	}
 
 	dir.setFilter(QDir::Dirs | QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-//	dir.setSorting(QDir::Size | QDir::Reversed);
 
 	QFileInfoList list = dir.entryInfoList();
 	QList<FolderItem> files {};
 	for (int i = 0; i < list.size(); ++i) {
 		QFileInfo fileInfo = list.at(i);
+		if ((fileInfo.fileName() == ".") || (fileInfo.fileName() == "..")) continue;
+
 		FolderItem current_item;
 		current_item.name = fileInfo.fileName();
 		current_item.size = fileInfo.size();
