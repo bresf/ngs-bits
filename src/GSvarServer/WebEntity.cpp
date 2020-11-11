@@ -143,7 +143,7 @@ QString WebEntity::getPageHeader()
 	stream << "					padding: 10px;\n";
 	stream << "				}\n";
 	stream << "				.row:after {\n";
-	stream << "					content: "";\n";
+	stream << "					content: \"\";\n";
 	stream << "					display: table;\n";
 	stream << "					clear: both;\n";
 	stream << "				}\n";
@@ -315,23 +315,43 @@ Response WebEntity::createError(WebEntity::ErrorType type, QString message)
 	return Response{headers, body.toLocal8Bit()};
 }
 
-QString WebEntity::cretateFolderListing(QList<FolderItem> in)
+Response WebEntity::cretateFolderListing(QList<FolderItem> in)
 {
 	QString output;
 	QTextStream stream(&output);
 
 	QString folder_name = "Folder name";
 
-	stream << "<h1>" << folder_name << "</h1><br />\n";
-	stream << "<div class=\"row\"><div class=\"column\">" << createFolderItemLink("to the parent folder", "", FolderItemIcon::TO_PARENT_FOLDER) << "</div><div class=\"column\"><h2>Size</h2></div><div class=\"column\"><h2>Modified</h2></div></div>\n";
+	stream << getPageHeader();
+	stream << getFolderIcons();
+
+	stream << "			<h1>" << folder_name << "</h1><br />\n";
+	stream << "			<div class=\"row\">\n";
+	stream << "				<div class=\"column\">" << createFolderItemLink("to the parent folder", "", FolderItemIcon::TO_PARENT_FOLDER) << "</div>\n";
+	stream << "				<div class=\"column\"><b>Size</b></div>\n";
+	stream << "				<div class=\"column\"><b>Modified</b></div>\n";
+	stream << "			</div>\n";
 
 	for (int i = 0; i < in.count(); ++i)
 	{
-		stream << "<div class=\"row\"><div class=\"column\">" << createFolderItemLink(in[i].name, "", getIconType(in[i])) << "</div><div class=\"column\"><h2>Size</h2></div><div class=\"column\"><h2>Modified</h2></div></div>\n";
+		stream << "			<div class=\"row\">\n";
+		stream << "				<div class=\"column\">" << createFolderItemLink(in[i].name, "", getIconType(in[i])) << "</div>\n";
+		stream << "				<div class=\"column\">" << in[i].size << "</div>\n";
+		stream << "				<div class=\"column\">" << in[i].modified.toString() << "</div>\n";
+		stream << "			</div>\n";
 	}
 
 	stream << "<hr />\n";
 	stream << "GSvarServer v.1.0\n";
 
-	return output;
+	stream << getPageFooter();
+
+
+	QByteArray headers {};
+	headers.append("HTTP/1.1 200 OK\n");
+	headers.append("Content-Length: " + QString::number(output.length()) + "\n");
+	headers.append("Content-Type: " + WebEntity::contentTypeToString(ContentType::TEXT_HTML) + "\n");
+	headers.append("\n");
+
+	return Response{headers, output.toLocal8Bit()};
 }

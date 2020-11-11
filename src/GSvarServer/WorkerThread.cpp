@@ -34,7 +34,7 @@ QByteArray WorkerThread::readFileContent(QString filename_with_path)
 	return content;
 }
 
-Response WorkerThread::serverStaticFile(QString filename_with_path, WebEntity::ContentType type, bool is_downloadable)
+Response WorkerThread::serveStaticFile(QString filename_with_path, WebEntity::ContentType type, bool is_downloadable)
 {
 	QByteArray body {};
 	try
@@ -47,6 +47,33 @@ Response WorkerThread::serverStaticFile(QString filename_with_path, WebEntity::C
 	}
 
 	return (Response{generateHeaders(getFileNameAndExtension(filename_with_path), body.length(), type, is_downloadable), body});
+}
+
+Response WorkerThread::serveFolderContent(QString folder)
+{
+	QDir dir(folder);
+	if (!dir.exists())
+	{
+		return WebEntity::createError(WebEntity::INTERNAL_SERVER_ERROR, "Requested folder does not exist");
+	}
+
+	dir.setFilter(QDir::Dirs | QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+//	dir.setSorting(QDir::Size | QDir::Reversed);
+
+	QFileInfoList list = dir.entryInfoList();
+	QList<FolderItem> files {};
+	for (int i = 0; i < list.size(); ++i) {
+		QFileInfo fileInfo = list.at(i);
+		FolderItem current_item;
+		current_item.name = fileInfo.fileName();
+		current_item.size = fileInfo.size();
+		current_item.modified = fileInfo.metadataChangeTime();
+		current_item.is_folder = fileInfo.isDir() ? true : false;
+		files.append(current_item);
+		qDebug() << "File:" << fileInfo.fileName() << ", " << fileInfo.size() << fileInfo.isDir();
+
+	}
+	return WebEntity::cretateFolderListing(files);
 }
 
 QByteArray WorkerThread::generateHeaders(QString filename, int length, WebEntity::ContentType type, bool is_downloadable)
@@ -137,14 +164,20 @@ void WorkerThread::run()
 	if ((first_url_part == "") && request_.method == Request::MethodType::GET)
 	{
 		qDebug() << "Valid user: " << SessionManager::hasValidToken("alex");
-		emit resultReady(serverStaticFile(":/assets/client/info.html", WebEntity::TEXT_HTML, false));
+		emit resultReady(serveStaticFile(":/assets/client/info.html", WebEntity::TEXT_HTML, false));
 		return;
 	}
 
 	// api info page (e.g. version info)
 	if ((first_url_part == "info") && request_.method == Request::MethodType::GET)
 	{
-		emit resultReady(serverStaticFile(":/assets/client/api.json", WebEntity::APPLICATION_JSON, false));
+		emit resultReady(serveStaticFile(":/assets/client/api.json", WebEntity::APPLICATION_JSON, false));
+		return;
+	}
+
+	if ((first_url_part == "folder") && request_.method == Request::MethodType::GET)
+	{
+		emit resultReady(serveFolderContent("./"));
 		return;
 	}
 
@@ -152,7 +185,7 @@ void WorkerThread::run()
 	{
 		if (!isEligibileToAccess()) return;
 
-		emit resultReady(serverStaticFile(":/assets/client/example.png", WebEntity::APPLICATION_OCTET_STREAM, true));
+		emit resultReady(serveStaticFile(":/assets/client/example.png", WebEntity::APPLICATION_OCTET_STREAM, true));
 		return;
 	}
 

@@ -105,7 +105,7 @@ public:
 
 	static QString getErrorPageTemplate();
 	static Response createError(WebEntity::ErrorType type, QString message);
-	static QString cretateFolderListing(QList<FolderItem> in);
+	static Response cretateFolderListing(QList<FolderItem> in);
 
 
 private:
