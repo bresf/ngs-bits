@@ -20,7 +20,7 @@ public:
 
 private:
 	bool isEligibileToAccess();
-	QString getFileNameAndExtension(QString filename_with_path);
+	QString getFileNameWithExtension(QString filename_with_path);
 	QByteArray readFileContent(QString filename);
 	Response serveStaticFile(QString filename, WebEntity::ContentType type, bool is_downloadable);
 	Response serveFolderContent(QString folder);

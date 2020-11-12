@@ -45,12 +45,14 @@ public:
 	{
 		APPLICATION_OCTET_STREAM,
 		APPLICATION_JSON,
+		APPLICATION_JAVASCRIPT,
 		IMAGE_JPEG,
 		IMAGE_PNG,
 		IMAGE_SVG_XML,
 		TEXT_PLAIN,
 		TEXT_CSV,
 		TEXT_HTML,
+		TEXT_XML,
 		MULTIPART_FORM_DATA
 	};
 
@@ -98,6 +100,7 @@ public:
 
 
 	static QString contentTypeToString(WebEntity::ContentType in);
+	static WebEntity::ContentType getContentTypeByFilename(QString filename);
 	static QString folderItemIconToString(WebEntity::FolderItemIcon in);
 	static QString errorTypeToText(WebEntity::ErrorType in);
 	static int errorCodeByType(WebEntity::ErrorType in);

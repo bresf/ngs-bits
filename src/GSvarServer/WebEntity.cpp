@@ -16,15 +16,35 @@ QString WebEntity::contentTypeToString(WebEntity::ContentType in)
 	{
 		case APPLICATION_OCTET_STREAM: return "application/octet-stream";
 		case APPLICATION_JSON: return "application/json";
+		case APPLICATION_JAVASCRIPT: return "application/javascript";
 		case IMAGE_JPEG: return "image/jpeg";
 		case IMAGE_PNG: return "image/png";
 		case IMAGE_SVG_XML: return "image/svg+xml";
 		case TEXT_PLAIN: return "text/plain";
 		case TEXT_CSV: return "text/csv";
 		case TEXT_HTML: return "text/html";
+		case TEXT_XML: return "text/xml";
 		case MULTIPART_FORM_DATA: return "multipart/form-data";
 	}
 	return "";
+}
+
+WebEntity::ContentType WebEntity::getContentTypeByFilename(QString filename)
+{
+	QList<QString> name_items = filename.split(".");
+	QString extention = name_items.takeLast().toLower();
+
+	if (extention == "json") return APPLICATION_JSON;
+	if (extention == "js") return APPLICATION_JAVASCRIPT;
+	if ((extention == "jpeg") || (extention == "jpg")) return IMAGE_JPEG;
+	if (extention == "png") return IMAGE_PNG;
+	if (extention == "svg") return IMAGE_SVG_XML;
+	if (extention == "txt") return TEXT_PLAIN;
+	if (extention == "csv") return TEXT_CSV;
+	if ((extention == "html") || (extention == "htm")) return TEXT_HTML;
+	if (extention == "xml") return TEXT_XML;
+
+	return APPLICATION_OCTET_STREAM;
 }
 
 QString WebEntity::folderItemIconToString(WebEntity::FolderItemIcon in)

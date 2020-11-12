@@ -46,7 +46,7 @@ Response WorkerThread::serveStaticFile(QString filename_with_path, WebEntity::Co
 		return WebEntity::createError(WebEntity::INTERNAL_SERVER_ERROR, e.message());
 	}
 
-	return (Response{generateHeaders(getFileNameAndExtension(filename_with_path), body.length(), type, is_downloadable), body});
+	return (Response{generateHeaders(getFileNameWithExtension(filename_with_path), body.length(), type, is_downloadable), body});
 }
 
 Response WorkerThread::serveFolderContent(QString folder)
@@ -182,6 +182,20 @@ void WorkerThread::run()
 		return;
 	}
 
+	if ((first_url_part == "static") && request_.method == Request::MethodType::GET)
+	{
+		QString path = Settings::string("server_root");
+
+		if (path_items.count() < 2)
+		{
+			emit resultReady(WebEntity::createError(WebEntity::FORBIDDEN, "This page is protected"));
+			return;
+		}
+		path = path.trimmed() + path_items[2];
+		emit resultReady(serveStaticFile(path, WebEntity::getContentTypeByFilename(path), false));
+		return;
+	}
+
 	if ((first_url_part == "file") && (request_.method == Request::MethodType::GET))
 	{
 		if (!isEligibileToAccess()) return;
@@ -240,7 +254,7 @@ void WorkerThread::run()
 	emit resultReady(WebEntity::createError(WebEntity::NOT_FOUND, "This page does not exist. Check the URL and try again"));
 }
 
-QString WorkerThread::getFileNameAndExtension(QString filename_with_path)
+QString WorkerThread::getFileNameWithExtension(QString filename_with_path)
 {
 	QList<QString> path_items = filename_with_path.split('/');
 	return path_items.takeLast();
