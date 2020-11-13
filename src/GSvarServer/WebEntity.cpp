@@ -24,6 +24,7 @@ QString WebEntity::contentTypeToString(WebEntity::ContentType in)
 		case TEXT_CSV: return "text/csv";
 		case TEXT_HTML: return "text/html";
 		case TEXT_XML: return "text/xml";
+		case TEXT_CSS: return "text/css";
 		case MULTIPART_FORM_DATA: return "multipart/form-data";
 	}
 	return "";
@@ -43,6 +44,7 @@ WebEntity::ContentType WebEntity::getContentTypeByFilename(QString filename)
 	if (extention == "csv") return TEXT_CSV;
 	if ((extention == "html") || (extention == "htm")) return TEXT_HTML;
 	if (extention == "xml") return TEXT_XML;
+	if (extention == "css") return TEXT_CSS;
 
 	return APPLICATION_OCTET_STREAM;
 }

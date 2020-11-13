@@ -53,6 +53,7 @@ public:
 		TEXT_CSV,
 		TEXT_HTML,
 		TEXT_XML,
+		TEXT_CSS,
 		MULTIPART_FORM_DATA
 	};
 
