@@ -10,6 +10,35 @@ WebEntity& WebEntity::instance()
 	return web_entity;
 }
 
+WebEntity::ContentType WebEntity::getContentTypeFromString(QString in)
+{
+	if (in.toLower() == "application/octet-stream") return APPLICATION_OCTET_STREAM;
+	if (in.toLower() == "application/json") return APPLICATION_JSON;
+	if (in.toLower() == "application/javascript") return APPLICATION_JAVASCRIPT;
+	if (in.toLower() == "image/jpeg") return IMAGE_JPEG;
+	if (in.toLower() == "image/png") return IMAGE_PNG;
+	if (in.toLower() == "image/svg+xml") return IMAGE_SVG_XML;
+	if (in.toLower() == "text/plain") return TEXT_PLAIN;
+	if (in.toLower() == "text/csv") return TEXT_CSV;
+	if (in.toLower() == "text/html") return TEXT_HTML;
+	if (in.toLower() == "text/xml") return TEXT_XML;
+	if (in.toLower() == "text/css") return TEXT_CSS;
+	if (in.toLower() == "multipart/form-data") return MULTIPART_FORM_DATA;
+
+	return APPLICATION_OCTET_STREAM;
+}
+
+Request::MethodType WebEntity::getMethodTypeFromString(QString in)
+{
+	if (in.toLower() == "get") return Request::MethodType::GET;
+	if (in.toLower() == "post") return Request::MethodType::POST;
+	if (in.toLower() == "delete") return Request::MethodType::DELETE;
+	if (in.toLower() == "put") return Request::MethodType::PUT;
+	if (in.toLower() == "patch") return Request::MethodType::PATCH;
+
+	return Request::MethodType::GET;
+}
+
 QString WebEntity::contentTypeToString(WebEntity::ContentType in)
 {
 	switch(in)

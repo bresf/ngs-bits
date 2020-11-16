@@ -4,11 +4,15 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QDebug>
+#include "Exceptions.h"
 
 class Helper
 {
 public:
 	static QString getAppName();
+	static QString getAppBaseName();
+	static int strToInt(QString in);
+	static bool canConvertToInt(QString in);
 
 private:
 	Helper();

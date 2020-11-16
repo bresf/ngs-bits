@@ -10,6 +10,7 @@
 #include "FileCache.h"
 #include "NGSD.h"
 #include "SessionManager.h"
+#include "EndpointFactory.h"
 
 class WorkerThread : public QThread
 {

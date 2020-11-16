@@ -98,8 +98,8 @@ public:
 		UNKNOWN_ERROR
 	};
 
-
-
+	static WebEntity::ContentType getContentTypeFromString(QString in);
+	static Request::MethodType getMethodTypeFromString(QString in);
 	static QString contentTypeToString(WebEntity::ContentType in);
 	static WebEntity::ContentType getContentTypeByFilename(QString filename);
 	static QString folderItemIconToString(WebEntity::FolderItemIcon in);

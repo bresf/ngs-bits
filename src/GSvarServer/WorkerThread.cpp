@@ -184,6 +184,10 @@ void WorkerThread::run()
 
 	if ((first_url_part == "static") && request_.method == Request::MethodType::GET)
 	{
+
+		qDebug() << "Accessing static content";
+		EndpointFactory::processRequestData(request_);
+
 		QString path = Settings::string("server_root");
 
 		if (path_items.count() < 2)
