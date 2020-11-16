@@ -12,7 +12,7 @@ Endpoint::ParamType EndpointFactory::getEndpointParamTypeFromString(QString in)
 	return Endpoint::ParamType::UNKNOWN;
 }
 
-Response EndpointFactory::processRequestData(Request request)
+void EndpointFactory::validateInputData(Request request)
 {
 	if (instance().endpoint_list_.count() == 0)
 	{
@@ -20,12 +20,7 @@ Response EndpointFactory::processRequestData(Request request)
 	}
 
 	Endpoint endpoint = getEndpointByUrl(request.path.trimmed());
-	qDebug() << "Is valid = " << isEndpointInputValid(endpoint, request);
-	return Response{};
-}
 
-bool EndpointFactory::isEndpointInputValid(Endpoint endpoint, Request request)
-{
 	QMap<QString, QString> params {}; // for now we can only have ether url or post params
 	if (request.method == Request::MethodType::POST)
 	{
@@ -38,8 +33,7 @@ bool EndpointFactory::isEndpointInputValid(Endpoint endpoint, Request request)
 
 	if (params.count() != endpoint.params.count())
 	{
-		qDebug() << "Parameter number mismatch";
-		return false;
+		THROW(ArgumentException, "Parameter number mismatch");
 	}
 
 	QMap<QString, QString>::const_iterator i = params.constBegin();
@@ -49,13 +43,9 @@ bool EndpointFactory::isEndpointInputValid(Endpoint endpoint, Request request)
 		{
 			THROW(ArgumentException, "Parameter " + i.key() + " has an invalid type");
 		}
-		qDebug() << i.key() << ": " << i.value();
 		++i;
 	}
-
-	return true;
 }
-
 
 EndpointFactory& EndpointFactory::instance()
 {

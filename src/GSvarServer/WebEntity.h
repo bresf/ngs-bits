@@ -18,7 +18,7 @@ struct Request
 	};
 	MethodType method;
 	QMap<QString, QString> headers;
-	QByteArray path;
+	QString path;
 	QString remote_address;
 	QMap<QString, QString> url_params;
 	QMap<QString, QString> form_urlencoded;

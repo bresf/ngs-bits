@@ -100,10 +100,10 @@ QByteArray WorkerThread::generateHeaders(int length, WebEntity::ContentType type
 	return generateHeaders("", length, type, false);
 }
 
-QString WorkerThread::getUrlPartWithoutParams(QByteArray url)
+QString WorkerThread::getUrlWithoutParams(QString url)
 {
-	QList<QByteArray> url_parts = url.split('?');
-	return QString(url_parts[0]);
+	QList<QString> url_parts = url.split('?');
+	return url_parts[0];
 }
 
 bool WorkerThread::isValidUser(QString user_id, QString password)
@@ -150,21 +150,23 @@ void WorkerThread::run()
 	qDebug() << "Processing path:" << request_.path;
 	QByteArray body {};
 
-	QList<QByteArray> path_items = request_.path.split('/');
-	if (path_items.isEmpty())
+	QList<QString> path_items = request_.path.split('/');
+	QString first_url_part = getUrlWithoutParams((path_items.count()>1) ? path_items[1] : path_items[0]);
+
+	try
 	{
-		emit resultReady(WebEntity::createError(WebEntity::BAD_REQUEST, "No path has been provided"));
+		EndpointFactory::validateInputData(request_);
+	}
+	catch (ArgumentException& e)
+	{
+		emit resultReady(WebEntity::createError(WebEntity::BAD_REQUEST, e.message()));
 		return;
 	}
 
-	QString first_url_part = getUrlPartWithoutParams(path_items[1]);
-	QMap<QString, QString> url_vars = request_.url_params;
-	qDebug() << "Variables from the request URL:" << url_vars;
 
 	// index page
 	if ((first_url_part == "") && request_.method == Request::MethodType::GET)
 	{
-		qDebug() << "Valid user: " << SessionManager::hasValidToken("alex");
 		emit resultReady(serveStaticFile(":/assets/client/info.html", WebEntity::TEXT_HTML, false));
 		return;
 	}
@@ -186,7 +188,7 @@ void WorkerThread::run()
 	{
 
 		qDebug() << "Accessing static content";
-		EndpointFactory::processRequestData(request_);
+
 
 		QString path = Settings::string("server_root");
 
@@ -195,7 +197,7 @@ void WorkerThread::run()
 			emit resultReady(WebEntity::createError(WebEntity::FORBIDDEN, "This page is protected"));
 			return;
 		}
-		path = path.trimmed() + path_items[2];
+		path = getUrlWithoutParams(path.trimmed() + path_items[2]);
 		emit resultReady(serveStaticFile(path, WebEntity::getContentTypeByFilename(path), false));
 		return;
 	}

@@ -5,7 +5,7 @@
 #include <QFile>
 #include "Helper.h"
 #include "WebEntity.h"
-#include "Exceptions.h"
+#include "WebExceptions.h"
 
 
 struct Endpoint
@@ -29,8 +29,7 @@ class EndpointFactory
 
 public:
 	static Endpoint::ParamType getEndpointParamTypeFromString(QString in);
-	static Response processRequestData(Request request);
-	static bool isEndpointInputValid(Endpoint endpoint, Request request);
+	static void validateInputData(Request request);
 
 private:
 	EndpointFactory();
