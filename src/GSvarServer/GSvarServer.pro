@@ -28,6 +28,7 @@ SOURCES += \
         SessionManager.cpp \
         SslServer.cpp \
         WebEntity.cpp \
+        WebExceptions.cpp \
         WorkerThread.cpp \
         main.cpp
 
@@ -45,6 +46,7 @@ HEADERS += \
     SessionManager.h \
     SslServer.h \
     WebEntity.h \
+    WebExceptions.h \
     WorkerThread.h
 
 include("../app_cli.pri")
