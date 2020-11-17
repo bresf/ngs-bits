@@ -4,12 +4,12 @@ EndpointFactory::EndpointFactory()
 {
 }
 
-Endpoint::ParamType EndpointFactory::getEndpointParamTypeFromString(QString in)
+ParamProps::ParamType EndpointFactory::getParamTypeFromString(QString in)
 {
-	if (in.toLower() == "string") return Endpoint::ParamType::STRING;
-	if ((in.toLower() == "int") || (in.toLower() == "integer")) return Endpoint::ParamType::INTEGER;
+	if (in.toLower() == "string") return ParamProps::ParamType::STRING;
+	if ((in.toLower() == "int") || (in.toLower() == "integer")) return ParamProps::ParamType::INTEGER;
 
-	return Endpoint::ParamType::UNKNOWN;
+	return ParamProps::ParamType::UNKNOWN;
 }
 
 void EndpointFactory::validateInputData(Request request)
@@ -39,7 +39,7 @@ void EndpointFactory::validateInputData(Request request)
 	QMap<QString, QString>::const_iterator i = params.constBegin();
 	while (i != params.constEnd())
 	{
-		if (isParamTypeValid(i.value(), endpoint.params[i.key()]))
+		if (isParamTypeValid(i.value(), endpoint.params[i.key()].type))
 		{
 			THROW(ArgumentException, "Parameter " + i.key() + " has an invalid type");
 		}
@@ -49,37 +49,14 @@ void EndpointFactory::validateInputData(Request request)
 
 QString EndpointFactory::generateGlobalHelp()
 {
-	QString output;
-	QTextStream stream(&output);
-
-	stream << WebEntity::getPageHeader();
-	stream << "			<h1>API Help Page</h1>\n";
-	stream << "			<div class=\"row\">\n";
-	stream << "				<div class=\"column-25\"><b>URL</b></div>\n";
-	stream << "				<div class=\"column-25\"><b>Method</b></div>\n";
-	stream << "				<div class=\"column-25\"><b>Parameters</b></div>\n";
-	stream << "				<div class=\"column-25\"><b>Description</b></div>\n";
-	stream << "			</div>\n";
-
-
-	for (int i = 0; i < instance().endpoint_list_.count(); ++i)
-	{
-		stream << "			<div class=\"row\">\n";
-		stream << "				<div class=\"column-25\">" << instance().endpoint_list_[i].url << "</div>\n";
-		stream << "				<div class=\"column-25\">" << WebEntity::convertMethodTypeToString(instance().endpoint_list_[i].method).toUpper() << "</div>\n";
-		stream << "				<div class=\"column-25\"></div>\n";
-		stream << "				<div class=\"column-25\">" << instance().endpoint_list_[i].comment << "</div>\n";
-		stream << "			</div>\n";
-	}
-
-	stream << WebEntity::getPageFooter();
-
-	return output;
+	return getEndpointHelpTemplate(&instance().endpoint_list_);
 }
 
-QString EndpointFactory::generateEntityHelp(QString endpoint_url)
+QString EndpointFactory::generateEntityHelp(QString url)
 {
-	return "";
+	QList<Endpoint> selected_endpoints {};
+	selected_endpoints.append(getEndpointByUrl(url));
+	return getEndpointHelpTemplate(&selected_endpoints);
 }
 
 EndpointFactory& EndpointFactory::instance()
@@ -116,7 +93,7 @@ QList<Endpoint> EndpointFactory::readEndpointConfig()
 
 			for (int i = 0; i < param_list.count(); ++i)
 			{
-				current_endpoint.params.insert(param_list[i], getEndpointParamTypeFromString(type_list[i]));
+				current_endpoint.params.insert(param_list[i], ParamProps{getParamTypeFromString(type_list[i]), ParamProps::GET_URL_VAR, false});
 			}
 
 			current_endpoint.method = WebEntity::getMethodTypeFromString(line_items[3]);
@@ -130,12 +107,12 @@ QList<Endpoint> EndpointFactory::readEndpointConfig()
 	return endpoints;
 }
 
-bool EndpointFactory::isParamTypeValid(QString param, Endpoint::ParamType type)
+bool EndpointFactory::isParamTypeValid(QString param, ParamProps::ParamType type)
 {
 	switch (type)
 	{
-		case Endpoint::ParamType::STRING: return true;
-		case Endpoint::ParamType::INTEGER: return Helper::canConvertToInt(param);
+		case ParamProps::ParamType::STRING: return true;
+		case ParamProps::ParamType::INTEGER: return Helper::canConvertToInt(param);
 
 		default: return false;
 	}
@@ -153,4 +130,34 @@ Endpoint EndpointFactory::getEndpointByUrl(QString url)
 	}
 
 	return Endpoint{};
+}
+
+QString EndpointFactory::getEndpointHelpTemplate(QList<Endpoint> *endpoint_list)
+{
+	QString output;
+	QTextStream stream(&output);
+
+	stream << WebEntity::getPageHeader();
+	stream << "			<h1>API Help Page</h1>\n";
+	stream << "			<div class=\"row\">\n";
+	stream << "				<div class=\"column-25\"><b>URL</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Method</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Parameters</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Description</b></div>\n";
+	stream << "			</div>\n";
+
+
+	for (int i = 0; i < endpoint_list->count(); ++i)
+	{
+		stream << "			<div class=\"row\">\n";
+		stream << "				<div class=\"column-25\">" << (*endpoint_list)[i].url << "</div>\n";
+		stream << "				<div class=\"column-25\">" << WebEntity::convertMethodTypeToString((*endpoint_list)[i].method).toUpper() << "</div>\n";
+		stream << "				<div class=\"column-25\"></div>\n";
+		stream << "				<div class=\"column-25\">" << (*endpoint_list)[i].comment << "</div>\n";
+		stream << "			</div>\n";
+	}
+
+	stream << WebEntity::getPageFooter();
+
+	return output;
 }
