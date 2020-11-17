@@ -100,6 +100,8 @@ public:
 
 	static WebEntity::ContentType getContentTypeFromString(QString in);
 	static Request::MethodType getMethodTypeFromString(QString in);
+	static QString convertMethodTypeToString(Request::MethodType in);
+
 	static QString contentTypeToString(WebEntity::ContentType in);
 	static WebEntity::ContentType getContentTypeByFilename(QString filename);
 	static QString folderItemIconToString(WebEntity::FolderItemIcon in);
@@ -111,6 +113,8 @@ public:
 	static Response createError(WebEntity::ErrorType type, QString message);
 	static Response cretateFolderListing(QList<FolderItem> in);
 
+	static QString getPageHeader();
+	static QString getPageFooter();
 
 private:
 	WebEntity();
@@ -122,8 +126,6 @@ private:
 	const QList<QString> TEXT_EXT = {"txt", "ini", "rtf", "doc", "docx"};
 	const QList<QString> TABLE_EXT = {"csv", "xls", "xlsx"};
 
-	static QString getPageHeader();
-	static QString getPageFooter();
 	static QString getFolderIcons();
 	static FolderItemIcon getIconType(FolderItem item);
 	static QString createFolderItemLink(QString name, QString url, WebEntity::FolderItemIcon type);

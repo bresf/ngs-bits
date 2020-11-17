@@ -39,6 +39,19 @@ Request::MethodType WebEntity::getMethodTypeFromString(QString in)
 	return Request::MethodType::GET;
 }
 
+QString WebEntity::convertMethodTypeToString(Request::MethodType in)
+{
+	switch(in)
+	{
+		case Request::MethodType::GET: return "get";
+		case Request::MethodType::POST: return "post";
+		case Request::MethodType::DELETE: return "delete";
+		case Request::MethodType::PUT: return "put";
+		case Request::MethodType::PATCH: return "patch";
+		default: return "unknown";
+	}
+}
+
 QString WebEntity::contentTypeToString(WebEntity::ContentType in)
 {
 	switch(in)
@@ -188,7 +201,17 @@ QString WebEntity::getPageHeader()
 	stream << "				* {\n";
 	stream << "					box-sizing: border-box;\n";
 	stream << "				}\n";
-	stream << "				.column {\n";
+	stream << "				.column-10 {\n";
+	stream << "					float: left;\n";
+	stream << "					width: 10%;\n";
+	stream << "					padding: 10px;\n";
+	stream << "				}\n";
+	stream << "				.column-25 {\n";
+	stream << "					float: left;\n";
+	stream << "					width: 25%;\n";
+	stream << "					padding: 10px;\n";
+	stream << "				}\n";
+	stream << "				.column-33 {\n";
 	stream << "					float: left;\n";
 	stream << "					width: 33.33%;\n";
 	stream << "					padding: 10px;\n";
@@ -378,17 +401,17 @@ Response WebEntity::cretateFolderListing(QList<FolderItem> in)
 
 	stream << "			<h1>" << folder_name << "</h1><br />\n";
 	stream << "			<div class=\"row\">\n";
-	stream << "				<div class=\"column\">" << createFolderItemLink("to the parent folder", "", FolderItemIcon::TO_PARENT_FOLDER) << "</div>\n";
-	stream << "				<div class=\"column\"><b>Size</b></div>\n";
-	stream << "				<div class=\"column\"><b>Modified</b></div>\n";
+	stream << "				<div class=\"column-33\">" << createFolderItemLink("to the parent folder", "", FolderItemIcon::TO_PARENT_FOLDER) << "</div>\n";
+	stream << "				<div class=\"column-33\"><b>Size</b></div>\n";
+	stream << "				<div class=\"column-33\"><b>Modified</b></div>\n";
 	stream << "			</div>\n";
 
 	for (int i = 0; i < in.count(); ++i)
 	{
 		stream << "			<div class=\"row\">\n";
-		stream << "				<div class=\"column\">" << createFolderItemLink(in[i].name, "", getIconType(in[i])) << "</div>\n";
-		stream << "				<div class=\"column\">" << in[i].size << "</div>\n";
-		stream << "				<div class=\"column\">" << in[i].modified.toString() << "</div>\n";
+		stream << "				<div class=\"column-33\">" << createFolderItemLink(in[i].name, "", getIconType(in[i])) << "</div>\n";
+		stream << "				<div class=\"column-33\">" << in[i].size << "</div>\n";
+		stream << "				<div class=\"column-33\">" << in[i].modified.toString() << "</div>\n";
 		stream << "			</div>\n";
 	}
 

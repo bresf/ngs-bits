@@ -202,6 +202,16 @@ void WorkerThread::run()
 		return;
 	}
 
+	if ((first_url_part == "help") && request_.method == Request::MethodType::GET)
+	{
+
+		body = EndpointFactory::generateGlobalHelp().toLocal8Bit();
+		emit resultReady(Response{generateHeaders(body.length(), WebEntity::TEXT_HTML), body});
+		return;
+
+	}
+
+
 	if ((first_url_part == "file") && (request_.method == Request::MethodType::GET))
 	{
 		if (!isEligibileToAccess()) return;

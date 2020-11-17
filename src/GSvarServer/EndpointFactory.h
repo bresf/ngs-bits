@@ -21,6 +21,7 @@ struct Endpoint
 	QMap<QString, ParamType> params;
 	Request::MethodType method;
 	WebEntity::ContentType return_type;
+	bool is_mandatory;
 	QString comment;
 };
 
@@ -30,6 +31,8 @@ class EndpointFactory
 public:
 	static Endpoint::ParamType getEndpointParamTypeFromString(QString in);
 	static void validateInputData(Request request);
+	static QString generateGlobalHelp();
+	static QString generateEntityHelp(QString endpoint_url);
 
 private:
 	EndpointFactory();

@@ -47,6 +47,41 @@ void EndpointFactory::validateInputData(Request request)
 	}
 }
 
+QString EndpointFactory::generateGlobalHelp()
+{
+	QString output;
+	QTextStream stream(&output);
+
+	stream << WebEntity::getPageHeader();
+	stream << "			<h1>API Help Page</h1>\n";
+	stream << "			<div class=\"row\">\n";
+	stream << "				<div class=\"column-25\"><b>URL</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Method</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Parameters</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Description</b></div>\n";
+	stream << "			</div>\n";
+
+
+	for (int i = 0; i < instance().endpoint_list_.count(); ++i)
+	{
+		stream << "			<div class=\"row\">\n";
+		stream << "				<div class=\"column-25\">" << instance().endpoint_list_[i].url << "</div>\n";
+		stream << "				<div class=\"column-25\">" << WebEntity::convertMethodTypeToString(instance().endpoint_list_[i].method).toUpper() << "</div>\n";
+		stream << "				<div class=\"column-25\"></div>\n";
+		stream << "				<div class=\"column-25\">" << instance().endpoint_list_[i].comment << "</div>\n";
+		stream << "			</div>\n";
+	}
+
+	stream << WebEntity::getPageFooter();
+
+	return output;
+}
+
+QString EndpointFactory::generateEntityHelp(QString endpoint_url)
+{
+	return "";
+}
+
 EndpointFactory& EndpointFactory::instance()
 {
 	static EndpointFactory endpoint_factory;
