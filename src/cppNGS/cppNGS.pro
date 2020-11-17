@@ -65,7 +65,6 @@ SOURCES += BedFile.cpp \
     VcfFileHelper.cpp \
     VcfFile.cpp \
     VariantScores.cpp \
-    FileLocationProvider.cpp \
     FileLocationProviderFileSystem.cpp \
     FileLocationHelper.cpp \
     PhenotypeList.cpp
@@ -101,7 +100,7 @@ HEADERS += BedFile.h \
     ClinvarSubmissionGenerator.h \
     VcfFileHelper.h \
     VcfFile.h \
-    VariantScores.h
+    VariantScores.h \
     FileLocationProvider.h \
     FileLocationProviderFileSystem.h \
     FileLocationHelper.h \
