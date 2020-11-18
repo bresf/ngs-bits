@@ -52,7 +52,7 @@ QString WebEntity::convertMethodTypeToString(Request::MethodType in)
 	}
 }
 
-QString WebEntity::contentTypeToString(WebEntity::ContentType in)
+QString WebEntity::convertContentTypeToString(WebEntity::ContentType in)
 {
 	switch(in)
 	{
@@ -91,7 +91,7 @@ WebEntity::ContentType WebEntity::getContentTypeByFilename(QString filename)
 	return APPLICATION_OCTET_STREAM;
 }
 
-QString WebEntity::folderItemIconToString(WebEntity::FolderItemIcon in)
+QString WebEntity::convertIconNameToString(WebEntity::FolderItemIcon in)
 {
 	switch(in)
 	{
@@ -107,7 +107,7 @@ QString WebEntity::folderItemIconToString(WebEntity::FolderItemIcon in)
 	return "";
 }
 
-QString WebEntity::errorTypeToText(WebEntity::ErrorType in)
+QString WebEntity::convertErrorTypeToText(WebEntity::ErrorType in)
 {
 	switch(in)
 	{
@@ -140,7 +140,7 @@ QString WebEntity::errorTypeToText(WebEntity::ErrorType in)
 	}
 }
 
-int WebEntity::errorCodeByType(WebEntity::ErrorType in)
+int WebEntity::getErrorCodeByType(WebEntity::ErrorType in)
 {
 	switch(in)
 	{
@@ -364,7 +364,7 @@ WebEntity::FolderItemIcon WebEntity::getIconType(FolderItem item)
 
 QString WebEntity::createFolderItemLink(QString name, QString url, WebEntity::FolderItemIcon type)
 {
-	return "<a class=\"file-list\" href=\"" +url + "\"><svg class=\"file-list\" width=\"2em\" height=\"2em\"><use xlink:href=\"#" + folderItemIconToString(type) + "\" /></svg> <span>" + name + "</span></a>";
+	return "<a class=\"file-list\" href=\"" +url + "\"><svg class=\"file-list\" width=\"2em\" height=\"2em\"><use xlink:href=\"#" + convertIconNameToString(type) + "\" /></svg> <span>" + name + "</span></a>";
 }
 
 Response WebEntity::createError(WebEntity::ErrorType type, QString message)
@@ -372,17 +372,17 @@ Response WebEntity::createError(WebEntity::ErrorType type, QString message)
 	qDebug() << "An error has been detected:" << message;
 
 	QByteArray headers {};
-	QString caption = errorTypeToText(type);
+	QString caption = convertErrorTypeToText(type);
 	QString body = getErrorPageTemplate();
 
 	if (message.isEmpty())
 	{
 		message	= "No information provided";
 	}
-	body.replace("%TITLE%", "Error " + QString::number(errorCodeByType(type)) + " - " + errorTypeToText(type));
+	body.replace("%TITLE%", "Error " + QString::number(getErrorCodeByType(type)) + " - " + convertErrorTypeToText(type));
 	body.replace("%MESSAGE%", message);
 
-	headers.append("HTTP/1.1 " + QString::number(errorCodeByType(type)) + " FAIL\n");
+	headers.append("HTTP/1.1 " + QString::number(getErrorCodeByType(type)) + " FAIL\n");
 	headers.append("Content-Length: " + QString::number(body.length()) + "\n");
 	headers.append("\n");
 
@@ -424,7 +424,7 @@ Response WebEntity::cretateFolderListing(QList<FolderItem> in)
 	QByteArray headers {};
 	headers.append("HTTP/1.1 200 OK\n");
 	headers.append("Content-Length: " + QString::number(output.length()) + "\n");
-	headers.append("Content-Type: " + WebEntity::contentTypeToString(ContentType::TEXT_HTML) + "\n");
+	headers.append("Content-Type: " + WebEntity::convertContentTypeToString(ContentType::TEXT_HTML) + "\n");
 	headers.append("\n");
 
 	return Response{headers, output.toLocal8Bit()};

@@ -102,11 +102,11 @@ public:
 	static Request::MethodType getMethodTypeFromString(QString in);
 	static QString convertMethodTypeToString(Request::MethodType in);
 
-	static QString contentTypeToString(WebEntity::ContentType in);
+	static QString convertContentTypeToString(WebEntity::ContentType in);
 	static WebEntity::ContentType getContentTypeByFilename(QString filename);
-	static QString folderItemIconToString(WebEntity::FolderItemIcon in);
-	static QString errorTypeToText(WebEntity::ErrorType in);
-	static int errorCodeByType(WebEntity::ErrorType in);
+	static QString convertIconNameToString(WebEntity::FolderItemIcon in);
+	static QString convertErrorTypeToText(WebEntity::ErrorType in);
+	static int getErrorCodeByType(WebEntity::ErrorType in);
 	static QString generateToken();
 
 	static QString getErrorPageTemplate();

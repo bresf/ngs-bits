@@ -84,7 +84,7 @@ QByteArray WorkerThread::generateHeaders(QString filename, int length, WebEntity
 	headers.append("Connection: Keep-Alive\n");
 	headers.append("Keep-Alive: timeout=5, max=1000\n");
 	headers.append("Content-Length: " + QString::number(length) + "\n");
-	headers.append("Content-Type: " + WebEntity::contentTypeToString(type) + "\n");
+	headers.append("Content-Type: " + WebEntity::convertContentTypeToString(type) + "\n");
 	if (is_downloadable)
 	{
 		headers.append("Content-Disposition: form-data; name=file_download; filename=" + filename + "\n");
