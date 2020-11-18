@@ -290,7 +290,7 @@ void MainWindow::on_actionDebug_triggered()
 
 			//load variants
 			VariantList variants;
-			variants.load(db.processedSamplePath(ps_id, NGSD::GSVAR));
+			variants.load(db.processedSamplePath(ps_id, PathType::GSVAR));
 
 			//score
 			VariantScores::Result result = VariantScores::score(algorithm, variants, phenotype_rois);
