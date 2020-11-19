@@ -27,6 +27,8 @@ INCLUDEPATH += $$PWD/../GSvarServer
 INCLUDEPATH += $$PWD/../cppTFW
 
 HEADERS += \
+    Helper-Test.h \
+    SessionManager-Test.h \
     WebEntity-Test.h
 
 SOURCES += \

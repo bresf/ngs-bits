@@ -19,7 +19,7 @@ void EndpointFactory::validateInputData(Request request)
 		instance().endpoint_list_ = readEndpointConfig();
 	}
 
-	Endpoint endpoint = getEndpointByUrl(request.path.trimmed());
+	Endpoint endpoint = getEndpointByUrl(request.path.trimmed().replace("/", ""));
 
 	QMap<QString, QString> params {}; // for now we can only have ether url or post params
 	if (request.method == Request::MethodType::POST)
@@ -31,6 +31,10 @@ void EndpointFactory::validateInputData(Request request)
 		params = request.url_params;
 	}
 
+	qDebug() << request.path.trimmed();
+	qDebug() << params.count();
+	qDebug() << endpoint.params.count();
+
 	if (params.count() != endpoint.params.count())
 	{
 		THROW(ArgumentException, "Parameter number mismatch");
@@ -39,7 +43,7 @@ void EndpointFactory::validateInputData(Request request)
 	QMap<QString, QString>::const_iterator i = params.constBegin();
 	while (i != params.constEnd())
 	{
-		if (isParamTypeValid(i.value(), endpoint.params[i.key()].type))
+		if (!isParamTypeValid(i.value(), endpoint.params[i.key()].type))
 		{
 			THROW(ArgumentException, "Parameter " + i.key() + " has an invalid type");
 		}
@@ -70,7 +74,7 @@ QList<Endpoint> EndpointFactory::readEndpointConfig()
 	qDebug() << "Reading the list of endpoints";
 	QList<Endpoint> endpoints {};
 
-	QFile file(Helper::getAppBaseName() + "_endpoints.ini");
+	QFile file(ServerHelper::getAppBaseName() + "_endpoints.ini");
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		THROW(FileAccessException, "Cannot get endpoint information");
 
@@ -112,7 +116,7 @@ bool EndpointFactory::isParamTypeValid(QString param, ParamProps::ParamType type
 	switch (type)
 	{
 		case ParamProps::ParamType::STRING: return true;
-		case ParamProps::ParamType::INTEGER: return Helper::canConvertToInt(param);
+		case ParamProps::ParamType::INTEGER: return ServerHelper::canConvertToInt(param);
 
 		default: return false;
 	}

@@ -122,6 +122,8 @@ void RequestHandler::processRequest(QList<QByteArray> body)
 				return;
 			}
 			request.path = request_info[1];
+
+			qDebug() << request_info[1];
 			request.url_params = getVariables(getVariableSequence(request_info[1]));
 			continue;
 		}

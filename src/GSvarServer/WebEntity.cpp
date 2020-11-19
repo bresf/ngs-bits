@@ -173,11 +173,6 @@ int WebEntity::getErrorCodeByType(WebEntity::ErrorType in)
 	}
 }
 
-QString WebEntity::generateToken()
-{
-	return QUuid::createUuid().toString(QUuid::WithoutBraces);
-}
-
 QString WebEntity::getPageHeader()
 {
 	QString output;

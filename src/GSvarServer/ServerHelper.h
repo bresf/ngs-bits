@@ -1,23 +1,25 @@
-#ifndef HELPER_H
-#define HELPER_H
+#ifndef SERVERHELPER_H
+#define SERVERHELPER_H
 
 #include <QCoreApplication>
 #include <QDir>
 #include <QDebug>
+#include <QUuid>
 #include "Exceptions.h"
 
-class Helper
+class ServerHelper
 {
 public:
 	static QString getAppName();
 	static QString getAppBaseName();
 	static int strToInt(QString in);
 	static bool canConvertToInt(QString in);
+	static QString generateUniqueStr();
 
 private:
-	Helper();
-	static Helper& instance();
+	ServerHelper();
+	static ServerHelper& instance();
 
 };
 
-#endif // HELPER_H
+#endif // SERVERHELPER_H

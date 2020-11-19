@@ -263,4 +263,82 @@ private slots:
 		error_msg = WebEntity::convertErrorTypeToText(WebEntity::ErrorType::UNKNOWN_ERROR);
 		S_EQUAL(error_msg, "Unknown Error");
 	}
+
+	void test_getErrorCodeByType()
+	{
+		int code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::BAD_REQUEST);
+		I_EQUAL(code, 400);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::UNAUTHORIZED);
+		I_EQUAL(code, 401);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::PAYMENT_REQUIRED);
+		I_EQUAL(code, 402);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::FORBIDDEN);
+		I_EQUAL(code, 403);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::NOT_FOUND);
+		I_EQUAL(code, 404);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::METHOD_NOT_ALLOWED);
+		I_EQUAL(code, 405);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::NOT_ACCEPTABLE);
+		I_EQUAL(code, 406);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::PROXY_AUTH_REQUIRED);
+		I_EQUAL(code, 407);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::REQUEST_TIMEOUT);
+		I_EQUAL(code, 408);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::CONFLICT);
+		I_EQUAL(code, 409);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::GONE);
+		I_EQUAL(code, 410);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::LENGTH_REQUIRED);
+		I_EQUAL(code, 411);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::PRECONDITION_FAILED);
+		I_EQUAL(code, 412);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::ENTITY_TOO_LARGE);
+		I_EQUAL(code, 413);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::URI_TOO_LONG);
+		I_EQUAL(code, 414);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::UNSUPPORTED_MEDIA_TYPE);
+		I_EQUAL(code, 415);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::RANGE_NOT_SATISFIABLE);
+		I_EQUAL(code, 416);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::EXPECTATION_FAILED);
+		I_EQUAL(code, 417);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::INTERNAL_SERVER_ERROR);
+		I_EQUAL(code, 500);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::NOT_IMPLEMENTED);
+		I_EQUAL(code, 501);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::BAD_GATEWAY);
+		I_EQUAL(code, 502);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::SERVICE_UNAVAILABLE);
+		I_EQUAL(code, 503);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::GATEWAY_TIMEOUT);
+		I_EQUAL(code, 504);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::VERSION_NOT_SUPPORTED);
+		I_EQUAL(code, 505);
+
+		code = WebEntity::getErrorCodeByType(WebEntity::ErrorType::UNKNOWN_ERROR);
+		I_EQUAL(code, 0);
+	}
 };

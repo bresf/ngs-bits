@@ -11,7 +11,6 @@
 struct Session
 {
 	QString user_id;
-	QString secure_token;
 	QDateTime login_time;
 };
 
@@ -19,7 +18,6 @@ class SessionManager
 {
 public:
 	static void addNewSession(QString id, Session in);
-	static QString getSessionIdBySecureToken(QString token);
 	static void removeSession(QString id);
 	static Session getSessionByUserId(QString id);
 	static Session getSessionBySecureToken(QString token);

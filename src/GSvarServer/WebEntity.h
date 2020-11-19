@@ -2,7 +2,6 @@
 #define REQUESTENTITY_H
 
 #include <QMap>
-#include <QUuid>
 #include <QDebug>
 #include <QDateTime>
 
@@ -106,8 +105,7 @@ public:
 	static WebEntity::ContentType getContentTypeByFilename(QString filename);
 	static QString convertIconNameToString(WebEntity::FolderItemIcon in);
 	static QString convertErrorTypeToText(WebEntity::ErrorType in);
-	static int getErrorCodeByType(WebEntity::ErrorType in);
-	static QString generateToken();
+	static int getErrorCodeByType(WebEntity::ErrorType in);	
 
 	static QString getErrorPageTemplate();
 	static Response createError(WebEntity::ErrorType type, QString message);

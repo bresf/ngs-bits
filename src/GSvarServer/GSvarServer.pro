@@ -22,9 +22,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         EndpointFactory.cpp \
         FileCache.cpp \
-        Helper.cpp \
         HttpsServer.cpp \
         RequestHandler.cpp \
+        ServerHelper.cpp \
         SessionManager.cpp \
         SslServer.cpp \
         WebEntity.cpp \
@@ -40,9 +40,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     EndpointFactory.h \
     FileCache.h \
-    Helper.h \
     HttpsServer.h \
     RequestHandler.h \
+    ServerHelper.h \
     SessionManager.h \
     SslServer.h \
     WebEntity.h \

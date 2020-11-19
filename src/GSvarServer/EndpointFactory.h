@@ -3,7 +3,7 @@
 
 #include <QDebug>
 #include <QFile>
-#include "Helper.h"
+#include "ServerHelper.h"
 #include "WebEntity.h"
 #include "WebExceptions.h"
 

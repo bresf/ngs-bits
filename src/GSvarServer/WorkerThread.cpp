@@ -30,7 +30,7 @@ QByteArray WorkerThread::readFileContent(QString filename_with_path)
 	}
 
 	qDebug() << "Adding file to the cache:" << filename_with_path;
-	FileCache::addFileToCache(WebEntity::generateToken(), filename_with_path, content);
+	FileCache::addFileToCache(ServerHelper::generateUniqueStr(), filename_with_path, content);
 	return content;
 }
 
@@ -230,10 +230,10 @@ void WorkerThread::run()
 
 		if (isValidUser(request_.form_urlencoded["name"], request_.form_urlencoded["password"]))
 		{
-			QString secure_token = WebEntity::generateToken();
-			Session cur_session = Session{request_.form_urlencoded["name"], secure_token, QDateTime::currentDateTime()};
+			QString secure_token = ServerHelper::generateUniqueStr();
+			Session cur_session = Session{request_.form_urlencoded["name"], QDateTime::currentDateTime()};
 
-			SessionManager::addNewSession(WebEntity::generateToken(), cur_session);
+			SessionManager::addNewSession(secure_token, cur_session);
 			body = secure_token.toLocal8Bit();
 			emit resultReady(Response{generateHeaders(body.length(), WebEntity::TEXT_PLAIN), body});
 			return;
@@ -254,7 +254,7 @@ void WorkerThread::run()
 		{
 			try
 			{
-				SessionManager::removeSession(SessionManager::getSessionIdBySecureToken(request_.form_urlencoded["token"]));
+				SessionManager::removeSession(request_.form_urlencoded["token"]);
 			} catch (Exception& e)
 			{
 				emit resultReady(WebEntity::createError(WebEntity::INTERNAL_SERVER_ERROR, e.message()));
@@ -264,6 +264,8 @@ void WorkerThread::run()
 			emit resultReady(Response{generateHeaders(body.length(), WebEntity::TEXT_PLAIN), body});
 			return;
 		}
+		emit resultReady(WebEntity::createError(WebEntity::FORBIDDEN, "You have provided an invalid token"));
+		return;
 
 	}
 
