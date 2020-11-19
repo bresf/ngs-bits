@@ -2,7 +2,7 @@
 #include "ServerHelper.h"
 #include "ServerHelper.cpp"
 
-TEST_CLASS(Helper_Test)
+TEST_CLASS(ServerHelper_Test)
 {
 Q_OBJECT
 private slots:
