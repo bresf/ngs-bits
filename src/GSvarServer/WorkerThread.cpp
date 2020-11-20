@@ -100,12 +100,6 @@ QByteArray WorkerThread::generateHeaders(int length, WebEntity::ContentType type
 	return generateHeaders("", length, type, false);
 }
 
-QString WorkerThread::getUrlWithoutParams(QString url)
-{
-	QList<QString> url_parts = url.split('?');
-	return url_parts[0];
-}
-
 bool WorkerThread::isValidUser(QString user_id, QString password)
 {
 	try
@@ -130,6 +124,12 @@ bool WorkerThread::isValidUser(QString user_id, QString password)
 	return false;
 }
 
+QString WorkerThread::getFileNameWithExtension(QString filename_with_path)
+{
+	QList<QString> path_items = filename_with_path.split('/');
+	return path_items.takeLast();
+}
+
 bool WorkerThread::isEligibileToAccess()
 {
 	if ((!request_.form_urlencoded.contains("token")) && (!request_.url_params.contains("token")))
@@ -145,13 +145,9 @@ bool WorkerThread::isEligibileToAccess()
 	return true;
 }
 
-void WorkerThread::run()
+void WorkerThread::processRequest()
 {
-	qDebug() << "Processing path:" << request_.path;
 	QByteArray body {};
-
-	QList<QString> path_items = request_.path.split('/');
-	QString first_url_part = getUrlWithoutParams((path_items.count()>1) ? path_items[1] : path_items[0]);
 
 	try
 	{
@@ -165,26 +161,26 @@ void WorkerThread::run()
 
 
 	// index page
-	if ((first_url_part == "") && request_.method == Request::MethodType::GET)
+	if ((request_.path == "") && request_.method == Request::MethodType::GET)
 	{
 		emit resultReady(serveStaticFile(":/assets/client/info.html", WebEntity::TEXT_HTML, false));
 		return;
 	}
 
 	// api info page (e.g. version info)
-	if ((first_url_part == "info") && request_.method == Request::MethodType::GET)
+	if ((request_.path == "info") && request_.method == Request::MethodType::GET)
 	{
 		emit resultReady(serveStaticFile(":/assets/client/api.json", WebEntity::APPLICATION_JSON, false));
 		return;
 	}
 
-	if ((first_url_part == "folder") && request_.method == Request::MethodType::GET)
+	if ((request_.path == "folder") && request_.method == Request::MethodType::GET)
 	{
 		emit resultReady(serveFolderContent("./"));
 		return;
 	}
 
-	if ((first_url_part == "static") && request_.method == Request::MethodType::GET)
+	if ((request_.path == "static") && request_.method == Request::MethodType::GET)
 	{
 
 		qDebug() << "Accessing static content";
@@ -192,17 +188,17 @@ void WorkerThread::run()
 
 		QString path = Settings::string("server_root");
 
-		if (path_items.count() < 2)
+		if (request_.path_params.count() < 1)
 		{
 			emit resultReady(WebEntity::createError(WebEntity::FORBIDDEN, "This page is protected"));
 			return;
 		}
-		path = getUrlWithoutParams(path.trimmed() + path_items[2]);
+		path = WebEntity::getUrlWithoutParams(path.trimmed() + request_.path_params[0]);
 		emit resultReady(serveStaticFile(path, WebEntity::getContentTypeByFilename(path), false));
 		return;
 	}
 
-	if ((first_url_part == "help") && request_.method == Request::MethodType::GET)
+	if ((request_.path == "help") && request_.method == Request::MethodType::GET)
 	{
 
 		body = EndpointManager::generateGlobalHelp().toLocal8Bit();
@@ -212,7 +208,7 @@ void WorkerThread::run()
 	}
 
 
-	if ((first_url_part == "file") && (request_.method == Request::MethodType::GET))
+	if ((request_.path == "file") && (request_.method == Request::MethodType::GET))
 	{
 		if (!isEligibileToAccess()) return;
 
@@ -220,7 +216,7 @@ void WorkerThread::run()
 		return;
 	}
 
-	if ((first_url_part == "login") && request_.method == Request::MethodType::POST)
+	if ((request_.path == "login") && request_.method == Request::MethodType::POST)
 	{
 		if (!request_.form_urlencoded.contains("name") || !request_.form_urlencoded.contains("password"))
 		{
@@ -243,7 +239,7 @@ void WorkerThread::run()
 		return;
 	}
 
-	if ((first_url_part == "logout") && request_.method == Request::MethodType::POST)
+	if ((request_.path == "logout") && request_.method == Request::MethodType::POST)
 	{
 		if (!request_.form_urlencoded.contains("token"))
 		{
@@ -272,8 +268,8 @@ void WorkerThread::run()
 	emit resultReady(WebEntity::createError(WebEntity::NOT_FOUND, "This page does not exist. Check the URL and try again"));
 }
 
-QString WorkerThread::getFileNameWithExtension(QString filename_with_path)
+void WorkerThread::run()
 {
-	QList<QString> path_items = filename_with_path.split('/');
-	return path_items.takeLast();
+	qDebug() << "Processing path:" << request_.path;
+	processRequest();
 }

@@ -27,8 +27,8 @@ private:
 	Response serveFolderContent(QString folder);
 	QByteArray generateHeaders(QString filename, int length, WebEntity::ContentType type, bool is_downloadable);
 	QByteArray generateHeaders(int length, WebEntity::ContentType type);
-	QString getUrlWithoutParams(QString url);
 	bool isValidUser(QString name, QString password);
+	void processRequest();
 	Request request_;
 
 signals:

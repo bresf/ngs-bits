@@ -21,6 +21,7 @@ struct Request
 	QString remote_address;
 	QMap<QString, QString> url_params;
 	QMap<QString, QString> form_urlencoded;
+	QList<QString> path_params;
 };
 
 struct Response
@@ -113,6 +114,8 @@ public:
 
 	static QString getPageHeader();
 	static QString getPageFooter();
+
+	static QString getUrlWithoutParams(QString url);
 
 private:
 	WebEntity();

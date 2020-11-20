@@ -269,6 +269,12 @@ QString WebEntity::getPageFooter()
 	return output;
 }
 
+QString WebEntity::getUrlWithoutParams(QString url)
+{
+	QList<QString> url_parts = url.split('?');
+	return url_parts[0];
+}
+
 QString WebEntity::getErrorPageTemplate()
 {
 	QString output;

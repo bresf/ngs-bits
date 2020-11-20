@@ -121,9 +121,29 @@ void RequestHandler::processRequest(QList<QByteArray> body)
 				writeResponse(WebEntity::createError(WebEntity::BAD_REQUEST, e.message()));
 				return;
 			}
-			request.path = request_info[1];
 
-			qDebug() << request_info[1];
+
+			QList<QString> path_items = QString(request_info[1]).split('/');
+
+			request.path = "";
+			if (path_items.count()>1)
+			{
+				request.path = WebEntity::getUrlWithoutParams(path_items[1]);
+			}
+			request.path_params = {};
+			if (path_items.count()>2)
+			{
+				for (int p = 2; p < path_items.count(); ++p)
+				{
+					if (!path_items[p].trimmed().isEmpty())
+					{
+						request.path_params.append(path_items[p].trimmed());
+					}
+				}
+			}
+
+
+			qDebug() << request.path_params;
 			request.url_params = getVariables(getVariableSequence(request_info[1]));
 			continue;
 		}

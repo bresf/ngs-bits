@@ -19,14 +19,14 @@ struct ParamProps
 	enum ParamCategory
 	{
 		PATH_PARAM, // http://url/{param}
-		GET_URL_VAR, // http://url?var=val
+		GET_URL_PARAM, // http://url?var=val
 		POST_URL_ENCODED, // application/x-www-form-urlencoded
 		POST_FORM_DATA // multipart/form-data
 	};
 
 	ParamType type;
 	ParamCategory category;
-	bool is_optional;
+	bool is_optional; // not applicable to PATH_PARAM
 
 	bool operator==(const ParamProps& p) const
 	{
