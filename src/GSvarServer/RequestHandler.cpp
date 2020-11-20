@@ -96,7 +96,32 @@ QByteArray RequestHandler::getVariableSequence(QByteArray url)
 	return url.split('?')[1];
 }
 
-void RequestHandler::processRequest(QList<QByteArray> body)
+QString RequestHandler::getRequestPath(QList<QString> path_items)
+{
+	if (path_items.count()>1)
+	{
+		return WebEntity::getUrlWithoutParams(path_items[1]);
+	}
+	return "";
+}
+
+QList<QString> RequestHandler::getRequestPathParams(QList<QString> path_items)
+{
+	QList<QString> params {};
+	if (path_items.count()>2)
+	{
+		for (int p = 2; p < path_items.count(); ++p)
+		{
+			if (!path_items[p].trimmed().isEmpty())
+			{
+				params.append(path_items[p].trimmed());
+			}
+		}
+	}
+	return params;
+}
+
+void RequestHandler::parseRequest(QList<QByteArray> body)
 {
 	Request request {};
 	request.remote_address = socket->peerAddress().toString();
@@ -125,23 +150,8 @@ void RequestHandler::processRequest(QList<QByteArray> body)
 
 			QList<QString> path_items = QString(request_info[1]).split('/');
 
-			request.path = "";
-			if (path_items.count()>1)
-			{
-				request.path = WebEntity::getUrlWithoutParams(path_items[1]);
-			}
-			request.path_params = {};
-			if (path_items.count()>2)
-			{
-				for (int p = 2; p < path_items.count(); ++p)
-				{
-					if (!path_items[p].trimmed().isEmpty())
-					{
-						request.path_params.append(path_items[p].trimmed());
-					}
-				}
-			}
-
+			request.path = getRequestPath(path_items);
+			request.path_params = getRequestPathParams(path_items);
 
 			qDebug() << request.path_params;
 			request.url_params = getVariables(getVariableSequence(request_info[1]));
@@ -188,7 +198,7 @@ void RequestHandler::processRequest(QList<QByteArray> body)
 void RequestHandler::dataReceived()
 {
 	qDebug() << "New request received";	
-	processRequest(getRequestBody());
+	parseRequest(getRequestBody());
 }
 
 void RequestHandler::writeResponse(Response response)

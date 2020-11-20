@@ -20,7 +20,7 @@ void EndpointManager::validateInputData(Request request)
 	}
 
 	Endpoint endpoint = getEndpointByUrl(request.path.trimmed().replace("/", ""));
-	int path_param_count = 0;
+//	int path_param_count = 0;
 	QMap<QString, ParamProps>::const_iterator i = endpoint.params.constBegin();
 	while (i != endpoint.params.constEnd())
 	{
@@ -50,21 +50,23 @@ void EndpointManager::validateInputData(Request request)
 			}
 		}
 
-		if(i.value().category == ParamProps::ParamCategory::PATH_PARAM)
-		{
-			path_param_count++;
-		}
-		else if ((!i.value().is_optional) && (!is_found))
+//		if(i.value().category == ParamProps::ParamCategory::PATH_PARAM)
+//		{
+//			path_param_count++;
+//		}
+//		else
+
+		if ((!i.value().is_optional) && (!is_found))
 		{
 			THROW(ArgumentException, "Parameter " + i.key() + " is missing");
 		}
 		++i;
 	}
 
-	if (request.path_params.count() != path_param_count)
-	{
-		THROW(ArgumentException, "Path parameters number mismatch");
-	}
+//	if (request.path_params.count() != path_param_count)
+//	{
+//		THROW(ArgumentException, "Path parameters number mismatch");
+//	}
 }
 
 void EndpointManager::appendEndpoint(Endpoint new_endpoint)
@@ -88,6 +90,18 @@ void EndpointManager::initialize()
 					   WebEntity::ContentType::TEXT_HTML,
 					   "Static content served from the server root folder (defined in the config file)"
 					});
+
+	appendEndpoint(Endpoint{
+					   "help",
+					   QMap<QString, ParamProps>({
+						   {"endpoint", ParamProps{ParamProps::ParamType::STRING, ParamProps::ParamCategory::PATH_PARAM, true}}
+					   }),
+					   Request::MethodType::GET,
+					   WebEntity::ContentType::TEXT_HTML,
+					   "Static content served from the server root folder (defined in the config file)"
+					});
+
+
 	appendEndpoint(Endpoint{
 					   "login",
 					   QMap<QString, ParamProps>({
@@ -114,10 +128,10 @@ QString EndpointManager::generateGlobalHelp()
 	return getEndpointHelpTemplate(&instance().endpoint_registry_);
 }
 
-QString EndpointManager::generateEntityHelp(QString url)
+QString EndpointManager::generateEntityHelp(QString path)
 {
 	QList<Endpoint> selected_endpoints {};
-	selected_endpoints.append(getEndpointByUrl(url));
+	selected_endpoints.append(getEndpointByUrl(path));
 	return getEndpointHelpTemplate(&selected_endpoints);
 }
 

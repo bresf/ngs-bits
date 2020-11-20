@@ -26,7 +26,7 @@ struct ParamProps
 
 	ParamType type;
 	ParamCategory category;
-	bool is_optional; // not applicable to PATH_PARAM
+	bool is_optional;
 
 	bool operator==(const ParamProps& p) const
 	{
@@ -57,7 +57,7 @@ public:
 	static void appendEndpoint(Endpoint new_endpoint);
 	static void initialize();
 	static QString generateGlobalHelp();
-	static QString generateEntityHelp(QString url);
+	static QString generateEntityHelp(QString path);
 
 private:
 	EndpointManager();

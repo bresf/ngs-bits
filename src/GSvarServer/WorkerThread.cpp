@@ -182,17 +182,8 @@ void WorkerThread::processRequest()
 
 	if ((request_.path == "static") && request_.method == Request::MethodType::GET)
 	{
-
 		qDebug() << "Accessing static content";
-
-
 		QString path = Settings::string("server_root");
-
-		if (request_.path_params.count() < 1)
-		{
-			emit resultReady(WebEntity::createError(WebEntity::FORBIDDEN, "This page is protected"));
-			return;
-		}
 		path = WebEntity::getUrlWithoutParams(path.trimmed() + request_.path_params[0]);
 		emit resultReady(serveStaticFile(path, WebEntity::getContentTypeByFilename(path), false));
 		return;
@@ -200,13 +191,17 @@ void WorkerThread::processRequest()
 
 	if ((request_.path == "help") && request_.method == Request::MethodType::GET)
 	{
-
-		body = EndpointManager::generateGlobalHelp().toLocal8Bit();
+		if (request_.path_params.count() == 0)
+		{
+			body = EndpointManager::generateGlobalHelp().toLocal8Bit();
+		}
+		else
+		{
+			body = EndpointManager::generateEntityHelp(request_.path_params[0]).toLocal8Bit();
+		}
 		emit resultReady(Response{generateHeaders(body.length(), WebEntity::TEXT_HTML), body});
 		return;
-
 	}
-
 
 	if ((request_.path == "file") && (request_.method == Request::MethodType::GET))
 	{

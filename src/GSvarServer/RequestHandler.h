@@ -37,7 +37,9 @@ private:
 	QList<QByteArray> getKeyValuePair(QByteArray in);
 	QMap<QString, QString> getVariables(QByteArray in);
 	QByteArray getVariableSequence(QByteArray url);
-	void processRequest(QList<QByteArray> body);
+	QString getRequestPath(QList<QString> path_items);
+	QList<QString> getRequestPathParams(QList<QString> path_items);
+	void parseRequest(QList<QByteArray> body);
 };
 
 #endif // REQUESTHANDLER
