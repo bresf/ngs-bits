@@ -155,7 +155,7 @@ void WorkerThread::run()
 
 	try
 	{
-		EndpointFactory::validateInputData(request_);
+		EndpointManager::validateInputData(request_);
 	}
 	catch (ArgumentException& e)
 	{
@@ -205,7 +205,7 @@ void WorkerThread::run()
 	if ((first_url_part == "help") && request_.method == Request::MethodType::GET)
 	{
 
-		body = EndpointFactory::generateGlobalHelp().toLocal8Bit();
+		body = EndpointManager::generateGlobalHelp().toLocal8Bit();
 		emit resultReady(Response{generateHeaders(body.length(), WebEntity::TEXT_HTML), body});
 		return;
 

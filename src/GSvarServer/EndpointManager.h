@@ -1,5 +1,5 @@
-#ifndef ENDPOINTFACTORY_H
-#define ENDPOINTFACTORY_H
+#ifndef ENDPOINTMANAGER_H
+#define ENDPOINTMANAGER_H
 
 #include <QDebug>
 #include <QFile>
@@ -36,25 +36,31 @@ struct Endpoint
 	Request::MethodType method;
 	WebEntity::ContentType return_type;
 	QString comment;
+
+	bool operator==(const Endpoint& e) const
+	{
+		return url==e.url && method==e.method && return_type==e.return_type && comment==e.comment;
+	}
 };
 
-class EndpointFactory
+class EndpointManager
 {
 
 public:
-	static ParamProps::ParamType getParamTypeFromString(QString in);
+	static ParamProps::ParamType getParamTypeFromString(QString in);	
 	static void validateInputData(Request request);
+	static void appendEndpoint(Endpoint new_endpoint);
+	static void initialize();
 	static QString generateGlobalHelp();
 	static QString generateEntityHelp(QString url);
 
 private:
-	EndpointFactory();
-	static EndpointFactory& instance();
-	static QList<Endpoint> readEndpointConfig();
+	EndpointManager();
+	static EndpointManager& instance();
 	static bool isParamTypeValid(QString param, ParamProps::ParamType type);
 	static Endpoint getEndpointByUrl(QString url);
 	static QString getEndpointHelpTemplate(QList<Endpoint> *endpoint_list);
-	QList<Endpoint> endpoint_list_;
+	QList<Endpoint> endpoint_registry_;
 };
 
-#endif // ENDPOINTFACTORY_H
+#endif // ENDPOINTMANAGER_H
