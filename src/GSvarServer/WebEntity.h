@@ -115,6 +115,9 @@ public:
 	static QString getPageHeader();
 	static QString getPageFooter();
 
+	static QString getApiHelpHeader(QString title);
+	static QString getApiHelpEntiry(QString url, QString method, QList<QString> params, QString comment);
+
 	static QString getUrlWithoutParams(QString url);
 
 private:

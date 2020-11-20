@@ -172,23 +172,16 @@ QString EndpointManager::getEndpointHelpTemplate(QList<Endpoint> *endpoint_list)
 	QTextStream stream(&output);
 
 	stream << WebEntity::getPageHeader();
-	stream << "			<h1>API Help Page</h1>\n";
-	stream << "			<div class=\"row\">\n";
-	stream << "				<div class=\"column-25\"><b>URL</b></div>\n";
-	stream << "				<div class=\"column-25\"><b>Method</b></div>\n";
-	stream << "				<div class=\"column-25\"><b>Parameters</b></div>\n";
-	stream << "				<div class=\"column-25\"><b>Description</b></div>\n";
-	stream << "			</div>\n";
-
+	stream << WebEntity::getApiHelpHeader("API Help Page");
 
 	for (int i = 0; i < endpoint_list->count(); ++i)
 	{
-		stream << "			<div class=\"row\">\n";
-		stream << "				<div class=\"column-25\">" << (*endpoint_list)[i].url << "</div>\n";
-		stream << "				<div class=\"column-25\">" << WebEntity::convertMethodTypeToString((*endpoint_list)[i].method).toUpper() << "</div>\n";
-		stream << "				<div class=\"column-25\"></div>\n";
-		stream << "				<div class=\"column-25\">" << (*endpoint_list)[i].comment << "</div>\n";
-		stream << "			</div>\n";
+		stream << WebEntity::getApiHelpEntiry(
+					  (*endpoint_list)[i].url,
+					  WebEntity::convertMethodTypeToString((*endpoint_list)[i].method),
+					  QList<QString>{},
+					  (*endpoint_list)[i].comment
+					);
 	}
 
 	stream << WebEntity::getPageFooter();

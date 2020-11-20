@@ -269,6 +269,37 @@ QString WebEntity::getPageFooter()
 	return output;
 }
 
+QString WebEntity::getApiHelpHeader(QString title)
+{
+	QString output;
+	QTextStream stream(&output);
+
+	stream << "			<h1>" << title << "</h1>\n";
+	stream << "			<div class=\"row\">\n";
+	stream << "				<div class=\"column-25\"><b>URL</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Method</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Parameters</b></div>\n";
+	stream << "				<div class=\"column-25\"><b>Description</b></div>\n";
+	stream << "			</div>\n";
+
+	return output;
+}
+
+QString WebEntity::getApiHelpEntiry(QString url, QString method, QList<QString> params, QString comment)
+{
+	QString output;
+	QTextStream stream(&output);
+
+	stream << "			<div class=\"row\">\n";
+	stream << "				<div class=\"column-25\">" << url << "</div>\n";
+	stream << "				<div class=\"column-25\">" << method.toUpper() << "</div>\n";
+	stream << "				<div class=\"column-25\"></div>\n";
+	stream << "				<div class=\"column-25\">" << comment << "</div>\n";
+	stream << "			</div>\n";
+
+	return output;
+}
+
 QString WebEntity::getUrlWithoutParams(QString url)
 {
 	QList<QString> url_parts = url.split('?');
