@@ -27,6 +27,11 @@ struct ParamProps
 	ParamType type;
 	ParamCategory category;
 	bool is_optional;
+
+	bool operator==(const ParamProps& p) const
+	{
+		return type==p.type && category==p.category && is_optional==p.is_optional;
+	}
 };
 
 struct Endpoint
@@ -39,7 +44,7 @@ struct Endpoint
 
 	bool operator==(const Endpoint& e) const
 	{
-		return url==e.url && method==e.method && return_type==e.return_type && comment==e.comment;
+		return url==e.url && params==e.params && method==e.method && return_type==e.return_type;
 	}
 };
 
