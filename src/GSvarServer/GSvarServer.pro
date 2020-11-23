@@ -22,6 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         EndpointManager.cpp \
         FileCache.cpp \
+        GlobalServiceProvider.cpp \
         HttpsServer.cpp \
         RequestHandler.cpp \
         ServerHelper.cpp \
@@ -40,6 +41,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     EndpointManager.h \
     FileCache.h \
+    GlobalServiceProvider.h \
     HttpsServer.h \
     RequestHandler.h \
     ServerHelper.h \

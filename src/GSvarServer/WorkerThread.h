@@ -5,12 +5,20 @@
 #include <QFile>
 #include <QDebug>
 #include <QDir>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+
 #include "Exceptions.h"
 #include "WebEntity.h"
 #include "FileCache.h"
 #include "NGSD.h"
 #include "SessionManager.h"
 #include "EndpointManager.h"
+
+#include "GlobalServiceProvider.h"
+#include "FileLocationProviderFileSystem.h"
+#include "VariantList.h"
 
 class WorkerThread : public QThread
 {

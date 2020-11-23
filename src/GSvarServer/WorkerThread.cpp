@@ -1,5 +1,6 @@
 #include "WorkerThread.h"
 
+
 WorkerThread::WorkerThread(Request request)
 	: request_(request)
 {
@@ -193,7 +194,25 @@ void WorkerThread::processRequest()
 	{
 		qDebug() << "File location service";
 
-		emit resultReady(serveStaticFile(":/assets/client/info.html", WebEntity::TEXT_HTML, false));
+		QString filename = "Sample_NA12878_01/example_output/NA12878_01.GSvar";
+		VariantList variants {};
+		variants.load(filename);
+		GlobalServiceProvider::instance().setfileLocationsProvider(QSharedPointer<FileLocationProviderFileSystem>(new FileLocationProviderFileSystem(filename, variants.getSampleHeader(), variants.type())));
+
+		QList<FileLocation> file_list = GlobalServiceProvider::instance().fileLocationsProvider()->getBamFiles();
+
+		QJsonDocument json_doc_output {};
+		QJsonArray json_list_output {};
+		QJsonObject json_obj_output {};
+
+		for (int i = 0; i < file_list.count(); ++i)
+		{
+			qDebug() << file_list[i].filename;
+			json_list_output.append(file_list[i].filename);
+		}
+		json_doc_output.setArray(json_list_output);
+
+		emit resultReady(Response{generateHeaders(json_doc_output.toJson().length(), WebEntity::APPLICATION_JSON), json_doc_output.toJson()});
 		return;
 	}
 
