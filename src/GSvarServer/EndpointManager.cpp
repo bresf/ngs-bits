@@ -13,17 +13,17 @@ ParamProps::ParamType EndpointManager::getParamTypeFromString(QString in)
 }
 
 void EndpointManager::validateInputData(Request request)
-{
+{	
 	if (instance().endpoint_registry_.count() == 0)
 	{
 		instance().initialize();
 	}
 
 	Endpoint endpoint = getEndpointByUrl(request.path.trimmed().replace("/", ""));
-//	int path_param_count = 0;
-	QMap<QString, ParamProps>::const_iterator i = endpoint.params.constBegin();
-	while (i != endpoint.params.constEnd())
-	{
+	QMapIterator<QString, ParamProps> i(endpoint.params);
+	while (i.hasNext()) {
+		i.next();
+
 		bool is_found = false;
 
 		if(i.value().category == ParamProps::ParamCategory::POST_URL_ENCODED)
@@ -43,6 +43,7 @@ void EndpointManager::validateInputData(Request request)
 			if (request.url_params.contains(i.key()))
 			{
 				is_found = true;
+				qDebug() << request.url_params[i.key()] << "," << endpoint.params[i.key()].type;
 				if (!isParamTypeValid(request.url_params[i.key()], endpoint.params[i.key()].type))
 				{
 					THROW(ArgumentException, i.key() + " parameter inside URL has an invalid type");
@@ -50,23 +51,13 @@ void EndpointManager::validateInputData(Request request)
 			}
 		}
 
-//		if(i.value().category == ParamProps::ParamCategory::PATH_PARAM)
-//		{
-//			path_param_count++;
-//		}
-//		else
-
+		qDebug() << "var:" << i.key();
 		if ((!i.value().is_optional) && (!is_found))
 		{
 			THROW(ArgumentException, "Parameter " + i.key() + " is missing");
 		}
-		++i;
-	}
 
-//	if (request.path_params.count() != path_param_count)
-//	{
-//		THROW(ArgumentException, "Path parameters number mismatch");
-//	}
+	}
 }
 
 void EndpointManager::appendEndpoint(Endpoint new_endpoint)
@@ -83,9 +74,9 @@ void EndpointManager::initialize()
 	appendEndpoint(Endpoint{"info", QMap<QString, ParamProps>{}, Request::MethodType::GET, WebEntity::ContentType::APPLICATION_JSON, "General information about this API"});
 	appendEndpoint(Endpoint{
 					   "static",
-					   QMap<QString, ParamProps>({
+					   QMap<QString, ParamProps>{
 						   {"filename", ParamProps{ParamProps::ParamType::STRING, ParamProps::ParamCategory::PATH_PARAM, false}}
-					   }),
+					   },
 					   Request::MethodType::GET,
 					   WebEntity::ContentType::TEXT_HTML,
 					   "Static content served from the server root folder (defined in the config file)"
@@ -93,30 +84,40 @@ void EndpointManager::initialize()
 
 	appendEndpoint(Endpoint{
 					   "help",
-					   QMap<QString, ParamProps>({
+					   QMap<QString, ParamProps>{
 						   {"endpoint", ParamProps{ParamProps::ParamType::STRING, ParamProps::ParamCategory::PATH_PARAM, true}}
-					   }),
+					   },
 					   Request::MethodType::GET,
 					   WebEntity::ContentType::TEXT_HTML,
 					   "Static content served from the server root folder (defined in the config file)"
 					});
 
+	appendEndpoint(Endpoint{
+					   "file_location",
+					   QMap<QString, ParamProps> {
+						   {"ps", ParamProps{ParamProps::ParamType::STRING, ParamProps::ParamCategory::GET_URL_PARAM, false}},
+						   {"type", ParamProps{ParamProps::ParamType::STRING, ParamProps::ParamCategory::GET_URL_PARAM, false}}
+					   },
+					   Request::MethodType::GET,
+					   WebEntity::ContentType::TEXT_HTML,
+					   "Retrieve file location information for scecific file types"
+					});
 
 	appendEndpoint(Endpoint{
 					   "login",
-					   QMap<QString, ParamProps>({
+					   QMap<QString, ParamProps>{
 							{"name", ParamProps{ParamProps::ParamType::STRING, ParamProps::ParamCategory::POST_URL_ENCODED, false}},
 							{"password", ParamProps{ParamProps::ParamType::STRING, ParamProps::ParamCategory::POST_URL_ENCODED, false}}
-					   }),
+					   },
 					   Request::MethodType::POST,
 					   WebEntity::ContentType::TEXT_PLAIN,
 					   "Secure token generation, the token will be used to access protected resources and to perform  certain API calls"
 					});
 	appendEndpoint(Endpoint{
 					   "logout",
-					   QMap<QString, ParamProps>({
+					   QMap<QString, ParamProps>{
 							{"token", ParamProps{ParamProps::ParamType::STRING, ParamProps::ParamCategory::POST_URL_ENCODED, false}}
-					   }),
+					   },
 					   Request::MethodType::POST,
 					   WebEntity::ContentType::TEXT_PLAIN,
 					   "Secure token invalidation, after this step the token cannot longer be used"

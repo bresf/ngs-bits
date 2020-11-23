@@ -159,7 +159,6 @@ void WorkerThread::processRequest()
 		return;
 	}
 
-
 	// index page
 	if ((request_.path == "") && request_.method == Request::MethodType::GET)
 	{
@@ -188,6 +187,17 @@ void WorkerThread::processRequest()
 		emit resultReady(serveStaticFile(path, WebEntity::getContentTypeByFilename(path), false));
 		return;
 	}
+
+
+	if ((request_.path == "file_location") && request_.method == Request::MethodType::GET)
+	{
+		qDebug() << "File location service";
+
+		emit resultReady(serveStaticFile(":/assets/client/info.html", WebEntity::TEXT_HTML, false));
+		return;
+	}
+
+
 
 	if ((request_.path == "help") && request_.method == Request::MethodType::GET)
 	{
