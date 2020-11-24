@@ -233,6 +233,13 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::on_actionDebug_triggered()
 {
+	qDebug() << "Debug session";
+	QString res = HttpHandler(HttpRequestHandler::INI).get("http://localhost/");
+	qDebug() << res;
+
+
+
+
 	QString user = Helper::userName();
 	if (user=="ahsturm1")
 	{
@@ -5138,7 +5145,7 @@ void MainWindow::contextMenuSingleVariant(QPoint pos, int index)
 
 			try
 			{
-				HttpHandler(HttpHandler::NONE).get(Settings::string("Alamut")+"/show?request="+value);
+				HttpHandler(HttpRequestHandler::NONE).get(Settings::string("Alamut")+"/show?request="+value);
 			}
 			catch (Exception& e)
 			{
