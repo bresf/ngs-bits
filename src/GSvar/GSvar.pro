@@ -92,7 +92,7 @@ SOURCES += main.cpp\
     PreferredTranscriptsWidget.cpp \
     GlobalServiceProvider.cpp \
     TumorOnlyReportWorker.cpp \
-    TumorOnlyReportDialog.cpp
+    TumorOnlyReportDialog.cpp \
     CfDNAPanelDesignDialog.cpp \
     DiseaseCourseWidget.cpp \
     CfDNAPanelWidget.cpp
